@@ -1,5 +1,8 @@
 SimpleTalk {
-	Script
+    Script
+        = BaseScript comment?
+
+	BaseScript
 		= handler
 		| function
 		| comment
@@ -107,5 +110,5 @@ SimpleTalk {
     = "FUNCTION" 
 
   comment
-    = "--"letter+
+    = "--"(~"\n" any)*
 }

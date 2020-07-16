@@ -229,8 +229,28 @@ describe("SimpleTalk Grammar", function () {
             let match = g.match('--thisisabadcomment', 'comment');
             assert.isTrue(match.succeeded());
         });
-        it.skip("bad comment", function () {
+        it ("bad comment", function () {
             let match = g.match('--ab c');
+            assert.isTrue(match.succeeded());
+        });
+        it ("comment with space", function () {
+            let match = g.match('--ab c', 'comment');
+            assert.isTrue(match.succeeded());
+        });
+        it ("comment with tab", function () {
+            let match = g.match('--ab\tc', 'comment');
+            assert.isTrue(match.succeeded());
+        });
+        it ("function with comment", function () {
+            let match = g.match('FUNCTION --ab c', 'Script');
+            assert.isTrue(match.succeeded());
+        });
+        it ("function with comment and newline", function () {
+            let match = g.match('FUNCTION --ab c\n', 'Script');
+            assert.isTrue(match.succeeded());
+        });
+        it ("comment with newline", function () {
+            let match = g.match('--ab c\n', 'comment');
             assert.isTrue(match.failed());
         });
     });
