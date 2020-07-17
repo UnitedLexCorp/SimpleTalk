@@ -254,5 +254,16 @@ describe("SimpleTalk Grammar", function () {
             assert.isTrue(match.failed());
         });
     });
+    describe("Realistic examples", function () {
+        it.skip("on clearScreen", function () {
+            let match = g.match("on clearScreen\n" +
+                                "  -- removes the paint from the card layer\n" +
+                                "  choose \"Select Tool\"\n" +
+                                "  doMenu \"Select All\"\n" +
+                                "  doMenu \"Clear Picture\"\n" +
+                                "end clearScreen\n");
+            assert.isTrue(match.succeeded());
+        });
+    });
     });
 })
