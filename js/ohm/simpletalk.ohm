@@ -3,14 +3,14 @@ SimpleTalk {
         = BaseScript comment?
 
 	BaseScript
-		= handler
+		= Handler
 		| function
 		| comment
 		| end
 
-	handler (an "on" event type handler)
-		= "on" symbol space+ statementList? "end" symbol  -- noArgHandler
-		| "on" symbol parameterList space+ statementList? "end" symbol -- argHandler
+	Handler (an "on" event type Handler)
+		= "on" symbol statementList? "end" symbol  -- noArgHandler
+		| "on" symbol parameterList statementList? "end" symbol -- argHandler
 
 	symbol (a symbol, id or keyword)
 		= id 	-- id_symbol
@@ -64,6 +64,7 @@ SimpleTalk {
     | "tick" | "prev" | "previous" | "msg" | "box" | "cards" | "cds" | "cd"
     | "background" | "backgrounds" | "bkgnd" | "bkgnds" | "bg" | "bgs" | "buttons" | "btn" | "btns" | "fields" | "fld"
     | "flds" | "words" | "lines" | "numtochar" | "value" | "length"
+    | "clearScreen"
 
 	menuType (a menu* keyword symbol)
 		= "bar" | "item" "s"? --itemTypeKeyword
