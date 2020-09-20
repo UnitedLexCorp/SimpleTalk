@@ -36,17 +36,6 @@ class Stack extends Part {
                 name
             );
         }
-
-        // We construct with an initial
-        // Background part, since there needs
-        // to be at least one
-        let initBackground = new Background(this);
-        this.addPart(initBackground);
-
-        // We construct with an initial Card part,
-        // since there needs to be at least one
-        let initCard = new Card(this);
-        this.addPart(initCard);
     }
 
     get type(){

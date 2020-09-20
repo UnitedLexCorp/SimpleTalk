@@ -140,8 +140,11 @@ const System = {
 
         // Create an initial blank Stack in this
         // case
-        this.newModel('stack', worldModel.id);
+        let stack = this.newModel('stack', worldModel.id);
         document.querySelector('st-stack').classList.add('current-stack');
+
+        this.newModel('background', stack.id);
+        this.newModel('card', stack.id);
 
         this.updateSerialization(worldModel.id);
         let msg = {type: 'command', commandName: 'openToolbox', args:[]};
@@ -569,6 +572,8 @@ System._commandHandlers['openToolbox'] = function(targetId){
 
     let windowModel = this.newModel('window', targetPart.id);
     let windowStack = this.newModel('stack', windowModel.id);
+    this.newModel('card', windowStack.id);
+
     windowModel.partProperties.setPropertyNamed(
         windowModel,
         'title',
@@ -634,6 +639,7 @@ System._commandHandlers['openScriptEditor'] = function(targetId){
     );
     let winView = this.findViewById(winModel.id);
     let winStackModel = this.newModel('stack', winModel.id);
+    this.newModel('card', winStackModel.id);
     let currentCardView = winView.querySelector('.current-stack .current-card');
     let currentCard = currentCardView.model;
 

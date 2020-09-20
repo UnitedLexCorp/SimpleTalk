@@ -28,9 +28,13 @@ describe('Stack Navigation Tests', () => {
     describe('Setup of StackView', () => {
         it('Can initialize a StackView with model', () => {
             stackModel = new Stack(null);
+            let cardModel = new Card(stackModel.id);
+            stackModel.addPart(cardModel)
             stackView = document.createElement('st-stack');
             stackView.setModel(stackModel);
+
             assert.exists(stackModel);
+            assert.exists(cardModel);
             assert.exists(stackView);
             assert.equal(stackModel, stackView.model);
         });
