@@ -30,6 +30,7 @@ import Compiler from './compiler.js';
 import semantics from '../ohm/semantics.js';
 // import grammar from '../ohm/grammar.js';
 
+import './chunking.js';
 
 const System = {
     name: "System",
@@ -811,6 +812,9 @@ if (window.grammar){
 }
 let languageSemantics = languageGrammar.createSemantics().addOperation('parse', semantics);
 System.compiler = new Compiler(languageGrammar, languageSemantics);
+
+/* Add Chunking to JS base object types */
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // Add the System object to window so
