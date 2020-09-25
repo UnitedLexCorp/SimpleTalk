@@ -5,6 +5,7 @@
  * SimpleTalk parts.
  */
 import idMaker from '../utils/idMaker.js';
+import ValueHolder from './ValueHolder.js';
 import {
     PartProperties,
     BasicProperty,
@@ -12,8 +13,9 @@ import {
 } from '../properties/PartProperties.js';
 
 
-class Part {
+class Part extends ValueHolder {
     constructor(anOwnerPart){
+        super();
 
         this.name = this.constructor.name;
 

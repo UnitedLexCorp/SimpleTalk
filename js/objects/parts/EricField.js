@@ -40,6 +40,22 @@ class EricField extends Part {
     get type(){
         return 'eric-field';
     }
+
+    get value(){
+        return this.partProperties.getPropertyNamed(
+            this,
+            'textContent'
+        );
+    }
+
+    set value(aValue){
+        let stringified = aValue.toString();
+        this.partProperties.setPropertyNamed(
+            this,
+            'textContent',
+            stringified
+        );
+    }
 };
 
 export {

@@ -79,6 +79,22 @@ class Button extends Part {
         return 'button';
     }
 
+    get value(){
+        return this.partProperties.getPropertyNamed(
+            this,
+            'name'
+        );
+    }
+
+    set value(aValue){
+        let stringified = aValue.toString();
+        this.partProperties.setPropertyNamed(
+            this,
+            'name',
+            stringified
+        );
+    }
+
     // Delegation override.
     // Buttons delegate passed or
     // untrapped command messages
