@@ -1,151 +1,119 @@
 /**
  * Utilities for SimpleTalk Chunking
  */
+const Chunk = function(value, getter=null, setter=null){
+    this.value = value;
+    if(getter){
+        this.get = getter;
+    }
+    if(setter){
+        this.set = setter;
+    }
+};
 
-/* Helpers for Binding Chunker functions */
-function chunkBy(aChunkName){
-    if(!this.chunkers || this.chunkers == undefined){
+Chunk.prototype.canChunkInto = function(chunkName){
+    if(!this.value.chunkers){
+        return false;
+    }
+    return Object.keys(this.value.chunkers).includes(chunkName);
+};
+
+Chunk.prototype.chunkInto = function(chunkName){
+    if(!this.canChunkInto(chunkName)){
         return null;
     }
-
-    let chunker = this.chunkers[aChunkName];
-    if(chunker){
-        return chunker.getAll.bind(this)();
-    }
-    return null;
+    let chunker = this.value.chunkers[chunkName].chunk.bind(this.value);
+    return chunker();
 };
 
-function chunkAt(aChunkName, anIndex){
-    if(!this.chunkers || this.chunkers == undefined){
+Chunk.prototype.combineFromChunks = function(chunkName, chunkArray){
+    if(!this.canChunkInto(chunkName)){
         return null;
     }
-
-    let chunker = this.chunkers[aChunkName];
-    if(chunker){
-        return chunker.getAt.bind(this)(anIndex);
-    }
-    return null;
+    let combiner = this.value.chunkers[chunkName].combine.bind(this.value);
+    return combiner(chunkArray);
 };
 
-/* JS String Chunking */
-String.prototype.chunkers = {};
-String.prototype.chunkBy = chunkBy;
-String.prototype.chunkAt = chunkAt;
-
-// Lines
-String.prototype.chunkers.line = {
-    getAll: function(){
-        return this.split("\n");
-    },
-
-    getAt(anIndex){
-        let all = this.split("\n");
-        if(anIndex >= all.length){
-            return null;
-        }
-        return all[anIndex];
-    },
-
-    setAt(anIndex, aString){
-        let all = this.split("\n");
-        let diff = anIndex - this.length;
-        if(diff >= 0){
-            let extraNewlines = "";
-            for(let i = 0; i < diff; i++){
-                extraNewlines += "\n";
-            }
-            return `${this}${extraNewlines}${aString}`;
-        }
-        all[anIndex] = aString;
-        return all.join("\n");
+Chunk.prototype.get = function(chunkName, index){
+    let chunks = this.chunkInto(chunkName);
+    if(!chunks){
+        return null;
     }
+    if(index >= chunks.length){
+        return null;
+    }
+    return chunks[index];
 };
 
-// Words
-String.prototype.chunkers.word = {
-    getAll: function(){
-        return this.split(" ");
-    },
+Chunk.prototype.set = function(chunkName, index, newValue){
+    let chunks = this.chunkInto(chunkName);
+    if(!chunks){
+        return null;
+    }
+    if(index >= chunks.length){
+        return null;
+    }
+    let foundChunk = chunks[index];
+    if(!foundChunk){
+        return null;
+    }
+    foundChunk.value = newValue;
+    return this.combineFromChunks(chunkName, chunks);
+};
 
-    getAt(anIndex){
-        let all = this.split(" ");
-        if(anIndex >= all.length){
-            return null;
+// Basic Array Implementation
+Array.prototype.asChunk = function(){
+    return new Chunk(this);
+};
+Array.prototype.chunkers = {
+    item: {
+        chunk: function(){
+            return this.slice().map(item => {
+                return new Chunk(item);
+            });
+        },
+        combine: function(anArrayOfChunks){
+            return anArrayOfChunks.map(chunk => {
+                return chunk.value;
+            });
         }
-        return all[anIndex];
-    },
-
-    setAt(anIndex, aString){
-        let all = this.split(" ");
-        let newSpaces = "";
-        let diff = anIndex - all.length;
-        if(diff >= 0){
-            for(let i = 0; i < diff; i++){
-                newSpaces += "\n";
-            }
-            return `${this}${newSpaces}${aString}`;
-        }
-        all[anIndex] = aString;
-        return all.join("\n");
     }
 };
 
-// Characters
-String.prototype.chunkers.character = {
-    getAll: function(){
-        let chars = [];
-        for(let i = 0; i < this.length; i++){
-            chars.push(this.charAt(i));
+// Basic String Implementation
+String.prototype.asChunk = function(){
+    return new Chunk(this);
+};
+String.prototype.chunkers = {
+    // Chunking by line
+    line: {
+        chunk: function(){
+            return this.split('\n').map(line => {
+                return new Chunk(line);
+            });
+        },
+        combine: function(anArrayOfLineChunks){
+            return anArrayOfLineChunks.map(lineChunk => {
+                return lineChunk.value;
+            }).join("\n").asChunk();
         }
-        return chars;
     },
 
-    getAt(anIndex){
-        if(anIndex >= this.length){
-            return null;
+    // Chunking by word
+    word: {
+        chunk: function(){
+            return this.split(' ').map(word => {
+                return new Chunk(word);
+            });
+        },
+        combine: function(anArrayOfWordChunks){
+            return anArrayOfWordChunks.map(wordChunk => {
+                return wordChunk.value;
+            }).join(' ').asChunk();
         }
-        return this.charAt(anIndex);
-    },
-
-    setAt(anIndex, aCharacter){
-        if(anIndex >= this.length){
-            return null;
-        }
-        let all = [];
-        for(let i = 0; i < this.length; i++){
-            all.push(this.charAt(i));
-        }
-        all[anIndex] = aCharacter;
-        return all.join("");
     }
 };
 
-/* JS Array Chunking */
-Array.prototype.chunkers = {};
-Array.prototype.chunkBy = chunkBy;
-Array.prototype.chunkAt = chunkAt;
-
-Array.prototype.chunkers.item = {
-    getAll: function(){
-        return this.slice();
-    },
-
-    getAt: function(anIndex){
-        if(anIndex >= this.length){
-            return null;
-        }
-        return this[anIndex];
-    },
-
-    setAt(anIndex, anObject){
-        let all = this.slice();
-        let diff = anIndex - all.length;
-        if(diff >= 0){
-            for(let i = 0; i < diff; i++){
-                all.push(null);
-            }
-        }
-        all.push(anObject);
-        return all;
-    }
+export {
+    Chunk
 };
