@@ -31,6 +31,15 @@ var table = new Tabulator("#tabulator-table", {
         {title:"Sender", field:"sender", headerFilter:true, formatter:"textarea", cellClick: idClick},
         {title:"Receiver", field:"receiver", headerFilter:true, formatter:"textarea", cellClick: idClick} ,
     ],
+    // by default, this library doesn't apply existing filters to new rows, so here we manually reset
+    // those column filters when a new row shows up
+    rowAdded:function(row){
+        filters = table.getHeaderFilters();
+        table.clearFilter(true);
+        filters.forEach(function (filter) {
+            table.setHeaderFilterValue(filter.field, filter.value);
+        });
+    },
 });
 
 clearButton.onclick = function() {
