@@ -21,7 +21,9 @@ var idClick = function(e, cell) {
 }
 
 var table = new Tabulator("#tabulator-table", {
-    height:600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+    // height:600, having a set height of table enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+    // if performance becomes a problem, go back to this solution
+    maxHeight:"100%",
     data:tablulatordata, //assign data to table
     reactiveData:true,
     layout:"fitColumns", //fit columns to width of table (optional)
