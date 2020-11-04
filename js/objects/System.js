@@ -217,6 +217,13 @@ const System = {
             throw new Error('Messages must be sent with target receivers specified!');
         }
 
+        if (!("originalSource" in aMessage)) {
+            aMessage["originalSource"] = {
+                name: source.name,
+                id: source.id,
+            }
+        }
+
         // TODO: in the future, we'd likely pass some more complete "state" through to the
         // debug tool.  But for now, the tree result 
         var simpleTree = this.buildSimpleTree(this.partsById, {id: 'world', type: 'World'});

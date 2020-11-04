@@ -30,6 +30,7 @@ var table = new Tabulator("#tabulator-table", {
     columns:[
         {title:"Time", field:"time", width:150},
         {title:"Message", field:"message", headerFilter:true, formatter:"textarea"},
+        {title:"Original Sender", field:"originalSender", headerFilter:true, formatter:"textarea", cellClick: idClick},
         {title:"Sender", field:"sender", headerFilter:true, formatter:"textarea", cellClick: idClick},
         {title:"Receiver", field:"receiver", headerFilter:true, formatter:"textarea", cellClick: idClick} ,
         {title:"Tree", field:"tree", formatter:"textarea"} ,
@@ -74,6 +75,7 @@ function handleMessageFromBackground(msg) {
         sender: `${msg.source.name} (id=${msg.source.id})`,
         receiver: `${msg.target.name} (id=${msg.target.name})`,
         tree: tabularizeTree(msg.tree, 0),
+        originalSender: `${msg.msg.originalSource.name} (id=${msg.msg.originalSource.id})`,
     }
     tablulatordata.push(j)
 }
