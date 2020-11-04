@@ -32,6 +32,7 @@ var table = new Tabulator("#tabulator-table", {
         {title:"Message", field:"message", headerFilter:true, formatter:"textarea"},
         {title:"Sender", field:"sender", headerFilter:true, formatter:"textarea", cellClick: idClick},
         {title:"Receiver", field:"receiver", headerFilter:true, formatter:"textarea", cellClick: idClick} ,
+        {title:"Tree", field:"tree", formatter:"textarea"} ,
     ],
     // by default, this library doesn't apply existing filters to new rows, so here we manually reset
     // those column filters when a new row shows up
@@ -51,19 +52,28 @@ clearButton.onclick = function() {
     }
 }
 
+// recursively produce a stringified version of
+// the tree, using a tabbed display of underscores
+// to represent the node-to-child relationship
+function tabularizeTree(node, tabCount) {
+    var s = "__".repeat(tabCount);
+    s += node.type + `(id=${node.id})` + "\n";
+    node.children.forEach(child => {
+        s += tabularizeTree(child, tabCount + 1)
+    })
+    return s;
+}
 
 function handleMessageFromBackground(msg) {
     console.log("getting message from background");
-    if (msg.length !== 3){
-        console.log("message is not length 3!: " + msg);
-        return;
-    }
+
     let now = new Date();
     var j = {
         time: now.toLocaleTimeString([], {hour12: false}) + `.${now.getMilliseconds()}`,
-        message: JSON.stringify(msg[0], null, '\t'),
-        sender: `${msg[1][0]} (id=${msg[1][1]})`,
-        receiver: `${msg[2][0]} (id=${msg[2][1]})`,
+        message: JSON.stringify(msg.msg, null, '\t'),
+        sender: `${msg.source.name} (id=${msg.source.id})`,
+        receiver: `${msg.target.name} (id=${msg.target.name})`,
+        tree: tabularizeTree(msg.tree, 0),
     }
     tablulatordata.push(j)
 }

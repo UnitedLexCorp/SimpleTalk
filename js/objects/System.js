@@ -200,16 +200,38 @@ const System = {
         }
     },
 
+    // returns a recursive tree structure, specified by a parent NODE
+    // where a NODE has the form {id: ID, type: TYPE, children: [NODES]}
+    buildSimpleTree: function(partsById, node) {
+        var part = partsById[node.id];
+
+        var children = part.subparts.map(spart => {
+            return {id: spart.id, type: spart.type};
+        });
+
+        return {...node, children: children.map(child => this.buildSimpleTree(partsById, child))};
+    },
+
     sendMessage: function(aMessage, source, target){
         if(!target || target == undefined){
             throw new Error('Messages must be sent with target receivers specified!');
         }
 
-        let messageData = [
-            aMessage,
-            [source.name, source.id],
-            [target.name, target.id]
-        ];
+        // TODO: in the future, we'd likely pass some more complete "state" through to the
+        // debug tool.  But for now, the tree result 
+        var simpleTree = this.buildSimpleTree(this.partsById, {id: 'world', type: 'World'});
+        let messageData = {
+            msg: aMessage,
+            source: {
+                name: source.name,
+                id: source.id,
+            },
+            target: {
+                name: target.name,
+                id: target.id,
+            },
+            tree: simpleTree,
+        };
 
         // if we don't have an origin we are running at test
         // can return the string "null"
