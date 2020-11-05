@@ -64,24 +64,7 @@
 	systemObject (system object such as card, stack etc)
 		= ("c" | "C") "ontainer" | ("b"| "B") "ackground" | ("b" | "B") "utton" | ("c" | "C") "ard" | ("f" | "F") "ield" | ("s" | "S") "tack" | ("w" | "W") "indow"
 
-	// TODO do we want to restrict function names (start with lowercase etc)?
-	// Note: we prevent keyword overloading
-	functionName (function name)
-		= ~keyword (letter (letter | digit)*)
-
-	builtInFunction (natively supported functions in SimpleTalk)
-		= builtInMathFunction | "charToNum" | "date" | "length" | "menus"
-		| "mouseClick" | "mouse"
-		| modifierKeyName "key" -- modifierKeyBuiltInFunction
-
-	// TODO should we insist on certain functions having no argument or single args
-	// at the grammar level?
-	builtInMathFunction (math function)
-		= "average" | "min" | "max" | "sum" | "random" | "sqrt" | "trunc" | "sin"
-		| "cos" | "tan" | "atan" | "exp" | "ln" | "abs"
-
 	// TODO do we want to restrict message names (start with lowercase etc)?
-	// should these be different from functionName?
 	// Note: we prevent keyword overloading
 	messageName (message name)
 		= ~(keyword end) letter+
@@ -99,9 +82,6 @@
 		| "open" systemObject --openObject
 		| "quit" | "resumeStack" | "resume" | "returnInField" | "returnKey" | "show menubar"
 		| "sizeWindow" | "startUp" | "suspendStack" | "suspend" | "tabKey"
-
-	modifierKeyName (a modifier key name)
-		= "command" | "option" | "control" | "shift"
 
 	direction
 		= "left" | "right" | "up" | "down"
