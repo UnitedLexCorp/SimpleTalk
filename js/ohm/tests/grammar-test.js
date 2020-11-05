@@ -57,12 +57,6 @@ describe("SimpleTalk Grammar", () => {
             global var1, var\nend myNewMessage`;
             matchAndsemanticMatchTest(s, 'MessageHandler');
         });
-        it ("Function handler (args, statements)", () => {
-            const s = `function myNewFunc(arg1, arg2)
-            global var1, var
-            global var1, var\nend myNewFunc`;
-            matchAndsemanticMatchTest(s, 'FunctionHandler');
-        });
     });
     describe("Messages", () => {
         it ("Message name", () => {
@@ -205,123 +199,6 @@ describe("SimpleTalk Grammar", () => {
                     })
                 })
             })
-        });
-    });
-    describe("Functions", () => {
-        it ("Function name", () => {
-            const strings = [
-                "f", "F", "f1", "F1", "afunction", "aFunction", "aFunction123"
-            ];
-            strings.forEach((s) => {
-                semanticMatchTest(s, 'functionName');
-            });
-        });
-        it ("Bad function name", () => {
-            const strings = [
-                "1", "1f", "1F", " function", "then", "on", "end"
-            ];
-            strings.forEach((s) => {
-                semanticMatchFailTest(s, 'functionName');
-            });
-        });
-        it ("Function handler (no args, no statements)", () => {
-            const s = `function myNewFunc()\nend myNewFunc`
-            semanticMatchTest(s, 'FunctionHandler')
-        });
-        it ("Function handler (args, no statements)", () => {
-            const s = `function myNewFunc(arg1, arg2)\nend myNewFunc`
-            semanticMatchTest(s, 'FunctionHandler')
-        });
-        it ("Function handler (args, single statement)", () => {
-            const s = `function myNewFunc(arg1, arg2)
-            global var1, var\nend myNewFunc`
-            semanticMatchTest(s, 'FunctionHandler')
-        });
-        it ("Function handler (args, statements)", () => {
-            const s = `function myNewFunc(arg1, arg2)
-            global var1, var
-            global var1, var\nend myNewFunc`
-            semanticMatchTest(s, 'FunctionHandler')
-        });
-        it ("Function handler (args, statements with 'pass' control flow)", () => {
-            const s = `function myNewFunc(arg1, arg2)
-            global var1, var
-            global var1, var
-            pass myNewFunc\nend myNewFunc`
-            semanticMatchTest(s, 'FunctionHandler')
-        });
-        it ("Function handler (args, statements with 'exit' control flow)", () => {
-            const s = `function myNewFunc(arg1, arg2)
-            global var1, var
-            exit myNewFunc\nend myNewFunc`
-            semanticMatchTest(s, 'FunctionHandler')
-
-            const t = `function myNewFunc(arg1, arg2)
-            global var1, var
-            global var1, var
-            exit to SimpleCard\nend myNewFunc`
-            semanticMatchTest(t, 'FunctionHandler')
-        });
-        it ("Bad Function handler (missing 'function' keyword)", () => {
-            const s = `funct myNewFunc(arg1, arg2)
-            global var1, var
-            global var1, var\nend myNewFunc`
-            semanticMatchFailTest(s, 'FunctionHandler')
-        });
-        it ("Bad Function handler (missing 'end' keyword)", () => {
-            const s = `function myNewFunc(arg1, arg2)
-            global var1, var
-            global var1, var\nmyNewFunc`
-            semanticMatchFailTest(s, 'FunctionHandler')
-        });
-        it ("Bad Function handler (missing '()')", () => {
-            const s = `function myNewFunc arg1, arg2
-            global var1, var
-            global var1, var\nend myNewFunc`
-            semanticMatchFailTest(s, 'FunctionHandler')
-        });
-        it ("Built in function syntax", () => {
-            const strings = [
-                "average()", "tan()", "mouseClick()", "sin(30)", "sin(30, 45)"
-            ];
-            strings.forEach((s) => {
-                semanticMatchTest(s, 'Function')
-                semanticMatchTest(s, 'Function_builtInFunction');
-            });
-        });
-        it ("Authored in function syntax", () => {
-            const strings = [
-                "myNewFun()", "myNewFun(arg1)", "myNewFun(arg1, arg2)", "myNewFun(50)"
-            ];
-            strings.forEach((s) => {
-                semanticMatchTest(s, 'Function')
-                semanticMatchTest(s, 'Function_authoredFunction');
-            });
-        });
-        it ("Built in math functions", () => {
-            const strings = [
-                "average", "min", "max", "sum", "random", "sqrt", "trunc", "sin",
-                "cos", "tan", "atan", "exp", "ln", "abs",
-            ];
-            strings.forEach((s) => {
-                semanticMatchTest(s, 'builtInFunction');
-            });
-        });
-        it ("Modifier key functions", () => {
-            const strings = [
-                "commandkey", "optionkey", "controlkey", "shiftkey"
-            ];
-            strings.forEach((s) => {
-                semanticMatchTest(s, 'builtInFunction');
-            });
-        });
-        it ("Basic built in functions", () => {
-            const strings = [
-                "charToNum", "date", "length", "menus", "mouse", "mouseClick"
-            ];
-            strings.forEach((s) => {
-                semanticMatchTest(s, 'builtInFunction');
-            });
         });
     });
     describe("Statement", () => {

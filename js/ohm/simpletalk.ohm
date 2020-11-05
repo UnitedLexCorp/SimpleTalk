@@ -4,7 +4,6 @@
 
 	ScriptPart
 		= MessageHandler
-		| FunctionHandler
 		| comment
 		| lineTerminator
 
@@ -72,34 +71,6 @@
 
 	systemObject (system object such as card, stack etc)
 		= ("c" | "C") "ontainer" | ("b"| "B") "ackground" | ("b" | "B") "utton" | ("c" | "C") "ard" | ("f" | "F") "ield" | ("s" | "S") "tack" | ("w" | "W") "indow"
-
-	// Function definition follows the HT convention
-	// """
-	// function functionName(parameterList)
-	//     statementList
-	// end functionName
-	// """
-
-	// TODO: Consider using the "Open/Close" formulation
-	// we have for MessageHandler. We could even use the
-	// MessageHandlerClose for functions, since they are
-	// identical
-	FunctionHandlerSyntax<name, parameters, statements>
-		= "function" name "(" ParameterList? ")" lineTerminator statements? "end" name
-
-	FunctionHandlerOpen = "function" functionName "(" ParameterList? ")" lineTerminator
-
-	FunctionHandlerClose = "end" functionName
-
-	FunctionHandler = FunctionHandlerOpen StatementList? FunctionHandlerClose
-
-	// For the moment we allow only the "function()" syntax to describe a function
-	// (as opposed to "the function" or "function of" more general syntax found on HT)
-	// TODO should we insist that authered functions start with a lower case letter?
-	Function
-		= builtInFunction "(" ParameterList? ")" --builtInFunction
-		// TODO do we need to prevent keyword overload?
-		| functionName "(" ParameterList? ")" --authoredFunction
 
 	Expression (an expression)
 		= Factor | "(" Expression ")" --parenthetical
