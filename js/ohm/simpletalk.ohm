@@ -64,16 +64,6 @@
 	systemObject (system object such as card, stack etc)
 		= ("c" | "C") "ontainer" | ("b"| "B") "ackground" | ("b" | "B") "utton" | ("c" | "C") "ard" | ("f" | "F") "ield" | ("s" | "S") "tack" | ("w" | "W") "indow"
 
-	Expression (an expression)
-		= Factor | "(" Expression ")" --parenthetical
-
-	Factor (a factor type expression)
-		= digit+ "." digit+ --float
-		| digit+ --integer
-		| "not" Expression --logicalNegation
-		| letter alnum* --literal
-		| "-" Expression --negation
-
 	// TODO do we want to restrict function names (start with lowercase etc)?
 	// Note: we prevent keyword overloading
 	functionName (function name)
