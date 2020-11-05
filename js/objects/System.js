@@ -212,18 +212,7 @@ const System = {
         return {...node, children: children.map(child => this.buildSimpleTree(partsById, child))};
     },
 
-    sendMessage: function(aMessage, source, target){
-        if(!target || target == undefined){
-            throw new Error('Messages must be sent with target receivers specified!');
-        }
-
-        if (!("originalSource" in aMessage)) {
-            aMessage["originalSource"] = {
-                name: source.name,
-                id: source.id,
-            }
-        }
-
+    passDevToolMessage: function(aMessage, source, target){
         // TODO: in the future, we'd likely pass some more complete "state" through to the
         // debug tool.  But for now, the tree result 
         var simpleTree = this.buildSimpleTree(this.partsById, {id: 'world', type: 'World'});
@@ -251,6 +240,23 @@ const System = {
             }
         }
         this.messageLog.push(messageData);
+    },
+
+    sendMessage: function(aMessage, source, target){
+        if(!target || target == undefined){
+            throw new Error('Messages must be sent with target receivers specified!');
+        }
+
+        // keep track of all sources which pass this message
+        if (!("senders" in aMessage)) {
+            aMessage["senders"] = [];
+        }
+        aMessage.senders.push({
+            name: source.name,
+            id: source.id,
+        })
+
+        this.passDevToolMessage(aMessage, source, target);
         target.receiveMessage(aMessage);
     },
 

@@ -64,6 +64,10 @@ function tabularizeTree(node, tabCount) {
     return s;
 }
 
+function formatNode(node) {
+   return `${node.name} (id=${node.id})`
+}
+
 function handleMessageFromBackground(msg) {
     console.log("getting message from background");
 
@@ -71,10 +75,10 @@ function handleMessageFromBackground(msg) {
     var j = {
         time: now.toLocaleTimeString([], {hour12: false}) + `.${now.getMilliseconds()}`,
         message: JSON.stringify(msg.msg, null, '\t'),
-        sender: `${msg.source.name} (id=${msg.source.id})`,
-        receiver: `${msg.target.name} (id=${msg.target.name})`,
+        sender: formatNode(msg.source),
+        receiver: formatNode(msg.target),
         tree: tabularizeTree(msg.tree, 0),
-        originalSender: `${msg.msg.originalSource.name} (id=${msg.msg.originalSource.id})`,
+        originalSender: formatNode(msg.msg.senders[0])
     }
     tablulatordata.push(j)
 }
