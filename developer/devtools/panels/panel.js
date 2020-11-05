@@ -48,9 +48,8 @@ var table = new Tabulator("#tabulator-table", {
 
 clearButton.onclick = function() {
     console.log("clearing data")
-    while (tablulatordata.length > 0) {
-        tablulatordata.shift()
-    }
+    tablulatordata = [];
+    table.setData(tablulatordata);
 }
 
 // recursively produce a stringified version of
