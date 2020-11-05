@@ -47,10 +47,7 @@
 
 	// Note we explicitly exclude keywords, i.e. control
 	Statement (a statement)
-		= ~"end" (GlobalStatement | Command)
-
-	GlobalStatement (a "global" statement)
-		= "global" #space+ ParameterList
+		= ~"end" Command
 
 	Command (a command statement)
    		= "go to" ("next" | "previous") systemObject --goToDirection

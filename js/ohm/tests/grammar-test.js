@@ -51,13 +51,6 @@ describe("SimpleTalk Grammar", () => {
         });
     });
     // TODO add more tests for handlers, comments, end etc
-    describe("Script Handler", () => {
-        it ("Message handler (args, single statement)", () => {
-            const s = `on myNewMessage arg1, arg2
-            global var1, var\nend myNewMessage`;
-            matchAndsemanticMatchTest(s, 'MessageHandler');
-        });
-    });
     describe("Messages", () => {
         it ("Message name", () => {
             const strings = [
@@ -82,35 +75,6 @@ describe("SimpleTalk Grammar", () => {
         it ("Message handler (args, no statements)", () => {
             const s = `on myNewMessage arg1, arg2\nend myNewMessage`
             matchAndsemanticMatchTest(s, 'MessageHandler')
-        });
-        it ("Message handler (args, single statement)", () => {
-            const s = `on myNewMessage arg1, arg2
-            global var1, var\nend myNewMessage`
-            matchAndsemanticMatchTest(s, 'MessageHandler')
-        });
-        it ("Message handler (args, statements)", () => {
-            const s = `on myNewMessage arg1, arg2
-            global var1, var
-            global var1, var\nend myNewMessage`
-            matchAndsemanticMatchTest(s, 'MessageHandler')
-        });
-        it ("Bad Message handler (missing 'on' keyword)", () => {
-            const s = `notkeyword myNewMessage arg1, arg2
-            global var1, var
-            global var1, var\nend myNewMessage`
-            semanticMatchFailTest(s, 'MessageHandler');
-        });
-        it ("Bad Message handler (missing 'end' keyword)", () => {
-            const s = `on myNewMessage arg1, arg2
-            global var1, var
-            global var1, var\nmyNewMessage`
-            semanticMatchFailTest(s, 'MessageHandler');
-        });
-        it ("Bad Message handler ('()')", () => {
-            const s = `on myNewMessage(arg1, arg2)
-            global var1, var
-            global var1, var\nend myNewMessage`
-            semanticMatchFailTest(s, 'MessageHandler');
         });
         it ("Built in message syntax", () => {
             const strings = [
@@ -180,29 +144,6 @@ describe("SimpleTalk Grammar", () => {
                     })
                 })
             })
-        });
-    });
-    describe("Statement", () => {
-        it ("Global Statement", () => {
-            semanticMatchTest("global param1, param2", "Statement");
-        });
-    });
-    describe("Statement List", () => {
-        it ("Single statement statement list", () => {
-            const s = `global param1, param2\n`;
-            semanticMatchTest(s, "StatementList");
-        });
-        it ("Bad single statement statement list (no newline)", () => {
-            const s = `global param1, param2`;
-            semanticMatchFailTest(s, "StatementList");
-        });
-        it ("Multi statement statement list", () => {
-            const s = ` global param1, param2\nglobal param1, param2\n`;
-            semanticMatchTest(s, "StatementList");
-        });
-        it ("Bad multi statement statement list (no newline)", () => {
-            const s = ` global param1, param2\tglobal param1, param2\n`;
-            semanticMatchFailTest(s, "StatementList");
         });
     });
     describe("Expressions", () => {
@@ -376,14 +317,6 @@ describe("SimpleTalk Grammar", () => {
         });
         it ("Bad param list (space)", () => {
             semanticMatchFailTest("pa ram1, param2", "ParameterList");
-        });
-    });
-    describe("Global Statement", () => {
-        it ("Basic global statement", () => {
-            semanticMatchTest("global param1, param2", "GlobalStatement");
-        });
-        it ("Bad global statement (no space)", () => {
-            semanticMatchFailTest("globalparam1, param2", "GlobalStatement");
         });
     });
     describe("Commands", () => {
