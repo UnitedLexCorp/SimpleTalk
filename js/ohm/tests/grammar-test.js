@@ -94,25 +94,6 @@ describe("SimpleTalk Grammar", () => {
             global var1, var\nend myNewMessage`
             matchAndsemanticMatchTest(s, 'MessageHandler')
         });
-        it ("Message handler (args, statements with 'pass' control flow)", () => {
-            const s = `on myNewMessage arg1, arg2
-            global var1, var
-            global var1, var
-            pass myNewMessage\nend myNewMessage`
-            matchAndsemanticMatchTest(s, 'MessageHandler')
-        });
-        it ("Message handler (args, statements with 'exit' control flow)", () => {
-            const s = `on myNewMessage arg1, arg2
-            global var1, var
-            exit myNewMessage\nend myNewMessage`
-            matchAndsemanticMatchTest(s, 'MessageHandler')
-
-            const s2 = `on myNewMessage arg1, arg2
-            global var1, var
-            global var1, var
-            exit to SimpleCard\nend myNewMessage`
-            matchAndsemanticMatchTest(s2, 'MessageHandler')
-        });
         it ("Bad Message handler (missing 'on' keyword)", () => {
             const s = `notkeyword myNewMessage arg1, arg2
             global var1, var

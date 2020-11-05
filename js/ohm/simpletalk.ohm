@@ -47,12 +47,7 @@
 
 	// Note we explicitly exclude keywords, i.e. control
 	Statement (a statement)
-		= ~"end" (GlobalStatement | ControlStructure | Command)
-
-	ControlStructure (a statement control structure)
-		= "exit" ("to SimpleCard" | messageName | functionName) --exit
-		| "pass" (messageName | functionName) --pass
-		| "return" functionName --return //TODO we need to return expressions as well!
+		= ~"end" (GlobalStatement | Command)
 
 	GlobalStatement (a "global" statement)
 		= "global" #space+ ParameterList
