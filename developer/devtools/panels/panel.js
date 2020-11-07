@@ -70,6 +70,10 @@ function formatNode(node) {
 
 function handleMessageFromBackground(msg) {
     console.log("getting message from background");
+    if (!msg.msg || !msg.source || !msg.target || !msg.tree) {
+        console.log(`invalid message: ${msg}`)
+        return;
+    }
 
     let now = new Date();
     var j = {
