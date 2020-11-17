@@ -32,6 +32,8 @@ import Halo from './views/Halo.js';
 import ohm from 'ohm-js';
 import Compiler from './compiler.js';
 import semantics from '../ohm/semantics.js';
+
+import store from './store.js'
 // import grammar from '../ohm/grammar.js';
 
 
@@ -87,6 +89,13 @@ const System = {
             this.loadFromEmpty();
         }
 
+        for (const d of document.querySelectorAll('.current-stack')) {
+            store.dispatch({ type: 'setCurrentStack', idToAdd: d.model.id })
+        };
+        for (const d of document.querySelectorAll('.current-card')) {
+            store.dispatch({ type: 'setCurrentCard', idToAdd: d.model.id })
+        };
+
         // By this point we should have a WorldView with
         // a model attached.
         this.isLoaded = true;
@@ -105,6 +114,7 @@ const System = {
                 worldSerialization
             );
             aWorldView.setModel(worldModel);
+            store.dispatch({ type: 'addPart', id: 'world', part: worldModel })
             this.partsById['world'] = worldModel;
             this.attachSubPartsFromDeserialized(
                 worldModel,
@@ -141,6 +151,7 @@ const System = {
 
     loadFromEmpty: function(){
         let worldModel = new this.availableParts['world']();
+        store.dispatch({ type: 'addPart', id: worldModel.id, part: worldModel })
         this.partsById[worldModel.id] = worldModel;
         let worldView = document.createElement(
             this.tagNameForViewNamed('world')
@@ -1308,6 +1319,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // that it is global on the page. We do this
     // for both debugging and testing.
     window.System = System;
+    window.store = store;
     // Add the possible views as webcomponents
     // in the custom element registry
     System.registerCustomElements();

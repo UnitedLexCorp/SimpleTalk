@@ -9,6 +9,7 @@
  * page. There should only be one of me on any given HTML page.
  */
 import PartView from './PartView.js';
+import store from '../store.js'
 
 const templateString = `
                 <style>
@@ -94,12 +95,16 @@ class WorldView extends PartView {
     updateCurrentStack(stackId){
         let currentStackView = this.querySelector('.current-stack');
         let nextStackView = document.getElementById(stackId);
+        let msg = { type: 'setCurrentStack' };
         if(currentStackView){
             currentStackView.classList.remove('current-stack');
+            msg['idToRemove'] = currentStackView.model.id;
         }
         if(nextStackView){
             nextStackView.classList.add('current-stack');
+            msg['idToAdd'] = nextStackView.model.id;
         }
+        store.dispatch(msg);
     }
 
     goToNextStack(){
@@ -115,6 +120,7 @@ class WorldView extends PartView {
                 nextStackView = stackChildren[nextStackIndex];
                 currentStackView.classList.remove('current-stack');
                 nextStackView.classList.add('current-stack');
+                store.dispatch({ type: 'setCurrentStack', idToAdd: nextStackView.model.id, idToRemove: currentStackView.model.id })
             } else {
                 // Otherwise we are at the last child st-stack element
                 // in the stack, which means we need to loop around
@@ -122,6 +128,7 @@ class WorldView extends PartView {
                 let firstStack = this.querySelector(':scope > st-stack');
                 currentStackView.classList.remove('current-stack');
                 firstStack.classList.add('current-stack');
+                store.dispatch({ type: 'setCurrentStack', idToAdd: firstStack.model.id, idToRemove: currentStackView.model.id })
             }
 
             // Then we might want to send some message through
@@ -143,6 +150,7 @@ class WorldView extends PartView {
                 prevStackView = stackChildren[prevStackIndex];
                 currentStackView.classList.remove('current-stack');
                 prevStackView.classList.add('current-stack');
+                store.dispatch({ type: 'setCurrentStack', idToAdd: prevStackView.model.id, idToRemove: currentStackView.model.id })
             } else {
                 // Otherwise, the current stack is the first st-stack
                 // child element in the stack. So we need to 'loop around'
@@ -150,6 +158,7 @@ class WorldView extends PartView {
                 prevStackView = this.querySelector(':scope > st-stack:last-child');
                 prevStackView.classList.add('current-stack');
                 currentStackView.classList.remove('current-stack');
+                store.dispatch({ type: 'setCurrentStack', idToAdd: prevStackView.model.id, idToRemove: currentStackView.model.id })
             }
 
             // Then we might want to send some message through
@@ -162,15 +171,21 @@ class WorldView extends PartView {
         let currentStackView = this.querySelector(':scope > .current-stack');
         let selectedStackView = this.querySelector(`:scope > [part-id='${stackId}']`);
 
+        let msg = { type: 'setCurrentStack', partType: 'stack'};
+
         if (currentStackView !== null) {
             currentStackView.classList.remove('current-stack');
+            msg['idToRemove'] = currentStackView.model.id;
         }
 
         if (selectedStackView !== null) {
             selectedStackView.classList.add('current-stack');
+            msg['idToAdd'] = selectedStackView.model.id;
         } else {
             console.log(`The stack id: ${stackId} couldn't be found on this stack`);
         }
+        store.dispatch(msg);
+
         // Then we might want to send some message through
         // the HC system, letting Parts know that we have
         // navigated?

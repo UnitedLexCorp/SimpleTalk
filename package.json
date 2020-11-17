@@ -33,6 +33,7 @@
     "mocha": "^8.0.1",
     "node-fetch": "^2.6.1",
     "ohm-js": "^0.14.0",
+    "redux": "^4.0.5",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
   },
