@@ -89,6 +89,8 @@ const System = {
             this.loadFromEmpty();
         }
 
+        // seed the store with existing current stacks/cards
+        // this is NOT how this data would eventually be populated
         for (const d of document.querySelectorAll('.current-stack')) {
             store.dispatch({ type: 'setCurrentStack', idToAdd: d.model.id })
         };
@@ -188,6 +190,7 @@ const System = {
             part.id = subSerialization.id;
             part.setFromDeserialized(subSerialization);
             aModel.addPart(part);
+            store.dispatch({ type: 'addPart', id: part.id, part: part })
             this.partsById[subSerialization.id] = part;
 
             // Recursively get the subparts of the subpart
@@ -375,6 +378,7 @@ const System = {
                 model.partProperties.setPropertyNamed(model, 'name', name);
             }
         }
+        store.dispatch({ type: 'addPart', id: model.id, part: model})
         this.partsById[model.id] = model;
 
         // Any created part might initialize its
