@@ -1314,12 +1314,31 @@ if (window.grammar){
 let languageSemantics = languageGrammar.createSemantics().addOperation('parse', semantics);
 System.compiler = new Compiler(languageGrammar, languageSemantics);
 
+function currentStackController({path, prev, next}) {
+    console.log("currentStackChanged!");
+    prev.filter(x => !next.includes(x)).map(id => {
+        console.log("remove", id)
+        // let selectedStackView = this.querySelector(`[part-id='${id}']`);
+        // currentStackView.classList.remove('current-stack');
+    })
+    next.filter(x => !prev.includes(x)).map(id => {
+        console.log("add", id)
+        // let selectedStackView = this.querySelector(`[part-id='${id}']`);
+        // currentStackView.classList.add('current-stack');
+    })
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Add the System object to window so
     // that it is global on the page. We do this
     // for both debugging and testing.
     window.System = System;
     window.store = store;
+    store.dispatch({
+        type: 'SUBSCRIBE', payload: {
+            path: 'currentStacks', key: 'currentStacks', fn: currentStackController
+        }
+    })
     // Add the possible views as webcomponents
     // in the custom element registry
     System.registerCustomElements();
