@@ -111,6 +111,27 @@ class DynamicProperty extends BasicProperty {
     }
 };
 
+// TODO: should system properties be removable?
+class SystemProperty extends BasicProperty {
+    constructor(name, defaultValue, aliases=[]){
+        super(name, defaultValue, true, aliases);
+    }
+
+    // as the property is readOnly, it should
+    // appear as immutable to the standard API
+    // but the system can backdoor set the new
+    // value directly
+    systemSetValue(owner, val, notify=true) {
+        this._value = val;
+        if(notify){
+            owner.propertyChanged(
+                this.name,
+                val
+            );
+        }
+    }
+};
+
 class PartProperties {
     constructor(){
         this._properties = [];
@@ -213,6 +234,13 @@ class PartProperties {
     // dynamic prop
     newDynamicProp(...args){
         let newProp = new DynamicProperty(...args);
+        this.addProperty(newProp);
+    }
+
+    // Convenience method for creating a new system
+    // property.
+    newSystemProp(...args){
+        let newProp = new SystemProperty(...args);
         this.addProperty(newProp);
     }
 

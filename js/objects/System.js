@@ -151,8 +151,9 @@ const System = {
 
         // Create an initial blank Stack in this
         // case
-        this.newModel('stack', worldModel.id);
-        document.querySelector('st-stack').classList.add('current-stack');
+        var stack = this.newModel('stack', worldModel.id);
+        stack.partProperties.findPropertyNamed('_current').systemSetValue(stack, true)
+        // document.querySelector('st-stack').classList.add('current-stack');
 
         this.updateSerialization(worldModel.id);
         let msg = {type: 'command', commandName: 'openToolbox', args:[]};

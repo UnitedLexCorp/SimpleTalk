@@ -32,6 +32,20 @@ class StackView extends PartView {
         this._shadowRoot.appendChild(
             template.content.cloneNode(true)
         );
+        this.setupPropHandlers = this.setupPropHandlers.bind(this);
+
+        // Setup prop change handlers
+        this.setupPropHandlers();
+    }
+
+    setupPropHandlers(){
+        this.onPropChange('_current', (value, partId) => {
+            if (value) {
+                document.querySelector(`[part-id="${partId}"]`).classList.add('current-stack')
+            } else {
+                document.querySelector(`[part-id="${partId}"]`).classList.remove('current-stack')
+            }
+        });
     }
 
     goToNextCard(){

@@ -29,6 +29,10 @@ class Stack extends Part {
             'resizable',
             false
         );
+        this.partProperties.newSystemProp(
+            '_current',
+            false
+        );
 
         // If we are initializing with a name,
         // set the name property
