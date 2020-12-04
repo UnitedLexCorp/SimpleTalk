@@ -1075,6 +1075,25 @@ System._commandHandlers['openToolbox'] = function(senders, targetId){
         System,
         System
     );
+
+    // Add a button to add a Field
+    let addFieldBtn = this.newModel('button', windowCurrentCardModel.id);
+    addFieldBtn.partProperties.setPropertyNamed(
+        addFieldBtn,
+        'name',
+        'Add Field to Card'
+    );
+    addFieldBtn._commandHandlers['click'] = function(){
+        let currentCardView = document.querySelector('.current-stack > .current-card');
+        let cardModel = currentCardView.model;
+        let newField = System.newModel('field', cardModel.id);
+        newField.partProperties.setPropertyNamed(
+            newField,
+            'name',
+            `Field ${newField.id}`
+        );
+    };
+
 };
 
 System._commandHandlers['openWorldCatalog'] = function(senders, targetId){

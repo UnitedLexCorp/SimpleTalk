@@ -18,6 +18,7 @@
     --palette-green: #41ccb4;
     --palette-orange: #ff7c5d;
     --palette-red: #c70151;
+    --palette-cornsik: #FFF8DC;
 }
 
 /* Keyframe Animations */
@@ -212,7 +213,8 @@ st-drawing {
  *----------------------------------------------------*/
 st-field {
     min-width: 300px;
-    min-height: 150px;
+    min-width: 300px;
+    background-color: var(--palette-cornsik);
 }
 
 /* =Layout Class Styles

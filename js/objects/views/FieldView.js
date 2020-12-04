@@ -34,6 +34,7 @@ const templateString = `
 
 :host {
     display: block;
+    position: relative;
     outline: none;
     resize: both;
     overflow: auto;
@@ -109,6 +110,7 @@ class FieldView extends PartView {
 
         // Bind methods
         this.onInput = this.onInput.bind(this);
+        this.onClick = this.onClick.bind(this);
         this.textToHtml = this.textToHtml.bind(this);
         this.setupPropHandlers = this.setupPropHandlers.bind(this);
         this.setUpToolbar = this.setUpToolbar.bind(this);
@@ -146,11 +148,13 @@ class FieldView extends PartView {
                 document.execCommand('insertHTML', false, '&#x9');
             };
         });
+        this.addEventListener('click', this.onClick);
     }
 
     afterDisconnected(){
         let textArea = this._shadowRoot.querySelector('.field-textarea');
         textArea.removeEventListener('input', this.onInput);
+        this.removeEventListener('click', this.onClick);
     }
 
     afterModelSet(){
@@ -304,6 +308,22 @@ class FieldView extends PartView {
             innerHTML
         );
     }
+
+    onClick(event){
+        if(event.button == 0){
+            // if the shift key is pressed we toggle the halo
+            if(event.shiftKey){
+                event.preventDefault();
+                event.stopPropagation();
+                if(this.hasOpenHalo){
+                    this.closeHalo();
+                } else {
+                    this.openHalo();
+                }
+            }
+        }
+    }
+
 };
 
 export {
