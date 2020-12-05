@@ -28,6 +28,11 @@ class Field extends Part {
         // Set the Field-specific
         // Part Properties
         this.partProperties.newBasicProp(
+            'mode',
+            'viewing'
+        );
+
+        this.partProperties.newBasicProp(
             'htmlContent',
             ''
         );

@@ -9,6 +9,13 @@
  */
 import PartView from './PartView.js';
 
+const haloButtonSVG = `
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tool" width="24" height="24" viewbox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="m0 0h24v24h0z" fill="none"/>
+  <path d="m7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6-6a6 6 0 0 1 -8 -8l3.5 3.5" />
+</svg>
+`;
+
 const templateString = `
 <style>
 .field {
@@ -25,7 +32,8 @@ const templateString = `
     position: absolute;
     display: flex;
     justify-content: center;
-    border-bottom: 1px solid;
+    border: 1px solid;
+    border-bottom: none;
     width: 100%;
 }
 
@@ -104,7 +112,8 @@ class FieldView extends PartView {
     constructor(){
         super();
 
-        this.editorCompleter = this.simpleTalkCompleter;
+        // this.editorCompleter = this.simpleTalkCompleter;
+        this.editorCompleter = null;
 
         this.template = document.createElement('template');
         this.template.innerHTML = templateString;
@@ -122,6 +131,8 @@ class FieldView extends PartView {
         this._toolbarHandler = this._toolbarHandler.bind(this);
         this.setEditorMode = this.setEditorMode.bind(this);
         this.simpleTalkCompleter = this.simpleTalkCompleter.bind(this);
+        this.initCustomHaloButton = this.initCustomHaloButton.bind(this);
+        this.toggleMode = this.toggleMode.bind(this);
 
         this.setupPropHandlers();
     }
@@ -158,6 +169,9 @@ class FieldView extends PartView {
             };
         });
         this.addEventListener('click', this.onClick);
+        if(!this.haloButton){
+            this.initCustomHaloButton();
+        }
     }
 
     afterDisconnected(){
@@ -234,7 +248,7 @@ class FieldView extends PartView {
         textArea.setAttribute("spellcheck", "true");
         if(mode === "SimpleTalk"){
             display = "none";
-            this.editorCompleter = this.simpleTalkCompleter;
+            // this.editorCompleter = this.simpleTalkCompleter;
             textArea.setAttribute("spellcheck", "false");
         }
         toolbarElementNames.forEach((name) => {
@@ -324,20 +338,64 @@ class FieldView extends PartView {
             if(event.shiftKey){
                 event.preventDefault();
                 event.stopPropagation();
-                // we hide the toolbar by default and open it only when the halo is open
-                let toolbar = this._shadowRoot.querySelector('.field-toolbar');
                 if(this.hasOpenHalo){
                     this.closeHalo();
-                    toolbar.style.top = `${toolbar.clientHeight + 5}px`;
-                    toolbar.style.visibility = "hidden";
+                    // toolbar.style.top = `${toolbar.clientHeight + 5}px`;
+                    // toolbar.style.visibility = "hidden";
                 } else {
                     this.openHalo();
-                    toolbar.style.top = `-${toolbar.clientHeight + 5}px`;
-                    toolbar.style.visibility = "unset";
+                    // toolbar.style.top = `-${toolbar.clientHeight + 5}px`;
+                    // toolbar.style.visibility = "unset";
                 }
             }
         }
+
     }
+    initCustomHaloButton(){
+        this.haloButton = document.createElement('div');
+        this.haloButton.id = "halo-field-toggle-mode";
+        this.haloButton.classList.add('halo-button');
+        this.haloButton.innerHTML = haloButtonSVG;
+        this.haloButton.style.marginRight = "6px";
+        this.haloButton.setAttribute('slot', 'bottom-row');
+        this.haloButton.setAttribute('title', 'Toggle field tools');
+        this.haloButton.addEventListener('click', this.toggleMode);
+    }
+
+    openHalo(){
+        // Override default. Here we add a custom button
+        // when showing.
+        let foundHalo = this.shadowRoot.querySelector('st-halo');
+        if(!foundHalo){
+            foundHalo = document.createElement('st-halo');
+            this.shadowRoot.appendChild(foundHalo);
+        }
+        foundHalo.append(this.haloButton);
+    }
+
+    toggleMode(){
+        // we hide the toolbar by default and open it only when the halo is open
+        let toolbar = this._shadowRoot.querySelector('.field-toolbar');
+        if (toolbar.style.visibility === "hidden"){
+            toolbar.style.visibility = "unset";
+            toolbar.style.top = `-${toolbar.clientHeight + 5}px`;
+        } else {
+            toolbar.style.visibility = "hidden";
+            toolbar.style.top = `${toolbar.clientHeight + 5}px`;
+        }
+        let currentMode = this.getAttribute('mode');
+        let nextMode = 'viewing'; // By default, set to viewing
+        let isEmpty = (!currentMode || currentMode == undefined || currentMode == "");
+        if(currentMode == 'viewing' || isEmpty){
+            nextMode = 'editing';
+        }
+        this.model.partProperties.setPropertyNamed(
+            this.model,
+            'mode',
+            nextMode
+        );
+    }
+
 
 };
 
