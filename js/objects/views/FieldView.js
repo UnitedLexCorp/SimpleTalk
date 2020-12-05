@@ -11,16 +11,22 @@ import PartView from './PartView.js';
 
 const templateString = `
 <style>
+.field {
+    max-height: 100%important;
+    overflow-y: auto;
+}
+
 .field-textarea {
     white-space: pre-wrap;
     padding: 5px;
 }
 
 .field-toolbar {
+    position: absolute;
     display: flex;
     justify-content: center;
-    padding:5px;
     border-bottom: 1px solid;
+    width: 100%;
 }
 
 .field-toolbar > * {
@@ -34,10 +40,9 @@ const templateString = `
 
 :host {
     display: block;
-    position: relative;
+    position: absolute;
     outline: none;
     resize: both;
-    overflow: auto;
 }
 :host(:active),
 :host(:focus){
@@ -141,6 +146,10 @@ class FieldView extends PartView {
         textArea.focus();
         // document.execCommand("defaultParagraphSeparator", false, "br");
         this.setUpToolbar();
+        // we hide the toolbar by default and open it only when the halo is open
+        let toolbar = this._shadowRoot.querySelector('.field-toolbar');
+        toolbar.style.top = `${toolbar.clientHeight + 5}px`;
+        toolbar.style.visibility = "hidden";
         // prevent the default tab key to leave focus on the field
         this.addEventListener("keydown", (event) => {
             if(event.key==="Tab"){
@@ -315,10 +324,16 @@ class FieldView extends PartView {
             if(event.shiftKey){
                 event.preventDefault();
                 event.stopPropagation();
+                // we hide the toolbar by default and open it only when the halo is open
+                let toolbar = this._shadowRoot.querySelector('.field-toolbar');
                 if(this.hasOpenHalo){
                     this.closeHalo();
+                    toolbar.style.top = `${toolbar.clientHeight + 5}px`;
+                    toolbar.style.visibility = "hidden";
                 } else {
                     this.openHalo();
+                    toolbar.style.top = `-${toolbar.clientHeight + 5}px`;
+                    toolbar.style.visibility = "unset";
                 }
             }
         }
