@@ -151,6 +151,7 @@ class FieldView extends PartView {
         this.simpleTalkCompleter = this.simpleTalkCompleter.bind(this);
         this.initCustomHaloButton = this.initCustomHaloButton.bind(this);
         this.toggleMode = this.toggleMode.bind(this);
+        this.toggleModePartProperty = this.toggleModePartProperty.bind(this);
 
         this.setupPropHandlers();
     }
@@ -167,6 +168,10 @@ class FieldView extends PartView {
                 this.htmlToText(textArea)
             );
         });
+        this.onPropChange('mode', (value, id) => {
+            let textArea = this._shadowRoot.querySelector('.field-textarea');
+            this.toggleMode(value);
+        });
     }
 
     afterConnected(){
@@ -175,10 +180,6 @@ class FieldView extends PartView {
         textArea.focus();
         // document.execCommand("defaultParagraphSeparator", false, "br");
         this.setUpToolbar();
-        // we hide the toolbar by default and open it only when the halo is open
-        let toolbar = this._shadowRoot.querySelector('.field-toolbar');
-        // toolbar.style.top = `${toolbar.clientHeight + 5}px`;
-        // toolbar.style.visibility = "hidden";
         // prevent the default tab key to leave focus on the field
         this.addEventListener("keydown", (event) => {
             if(event.key==="Tab"){
@@ -213,6 +214,9 @@ class FieldView extends PartView {
             'textContent',
             this.htmlToText(textArea)
         );
+        // set the editing mode
+        let mode = this.model.partProperties.getPropertyNamed(this.model, "mode");
+        this.toggleMode(mode);
     }
 
     setUpToolbar(){
@@ -377,7 +381,7 @@ class FieldView extends PartView {
         this.haloButton.style.marginRight = "6px";
         this.haloButton.setAttribute('slot', 'bottom-row');
         this.haloButton.setAttribute('title', 'Toggle field tools');
-        this.haloButton.addEventListener('click', this.toggleMode);
+        this.haloButton.addEventListener('click', this.toggleModePartProperty);
     }
 
     openHalo(){
@@ -391,22 +395,15 @@ class FieldView extends PartView {
         foundHalo.append(this.haloButton);
     }
 
-    toggleMode(){
-        // we hide the toolbar by default and open it only when the halo is open
-        let toolbar = this._shadowRoot.querySelector('.field-toolbar');
-        let textarea = this._shadowRoot.querySelector('.field-textarea');
-        if (toolbar.style.opacity === "0"){
-            toolbar.style.opacity = "1";
-            textarea.setAttribute("contenteditable", "true");
-        } else {
-            toolbar.style.opacity = "0";
-            textarea.setAttribute("contenteditable", "false");
-        }
-        let currentMode = this.getAttribute('mode');
-        let nextMode = 'viewing'; // By default, set to viewing
-        let isEmpty = (!currentMode || currentMode == undefined || currentMode == "");
-        if(currentMode == 'viewing' || isEmpty){
-            nextMode = 'editing';
+    /*
+     * I toggle the editing mode of field, by setting the 'mode'
+     * partProperty to either "viewing" or "editing."
+     */
+    toggleModePartProperty(){
+        let currentMode = this.model.partProperties.getPropertyNamed(this.model, "mode");
+        let nextMode = 'editing'; // By default, set to editing
+        if(currentMode === 'editing'){
+            nextMode = 'viewing';
         }
         this.model.partProperties.setPropertyNamed(
             this.model,
@@ -415,7 +412,24 @@ class FieldView extends PartView {
         );
     }
 
-
+    /*
+     * I toggle the editing mode of field and toolbar, by setting
+     * the opacity of toolbar to 0 or 1 and conteneditable of textarea to
+     * false or true, respectively.
+     */
+    toggleMode(mode){
+        let toolbar = this._shadowRoot.querySelector('.field-toolbar');
+        let textarea = this._shadowRoot.querySelector('.field-textarea');
+        if(mode === "viewing"){
+            toolbar.style.opacity = "0";
+            textarea.setAttribute("contenteditable", "false");
+        } else if(mode === "editing") {
+            toolbar.style.opacity = "1";
+            textarea.setAttribute("contenteditable", "true");
+        } else {
+            throw `Unkown field mode ${mode}`;
+        }
+    }
 };
 
 export {

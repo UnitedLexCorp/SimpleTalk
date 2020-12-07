@@ -29,7 +29,7 @@ class Field extends Part {
         // Part Properties
         this.partProperties.newBasicProp(
             'mode',
-            'viewing'
+            'editing'
         );
 
         this.partProperties.newBasicProp(
