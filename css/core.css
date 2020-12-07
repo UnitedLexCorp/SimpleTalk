@@ -212,9 +212,8 @@ st-drawing {
 /* =Field Styles
  *----------------------------------------------------*/
 st-field {
-    min-width: 600px;
-    min-height: 300px;
-    background-color: var(--palette-cornsik);
+    width: 800px;
+    height: 300px;
 }
 
 /* =Layout Class Styles

@@ -19,22 +19,38 @@ const haloButtonSVG = `
 const templateString = `
 <style>
 .field {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
     max-height: 100%important;
+    height: 100%;
+    width: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+.field-textarea-wrapper {
+    width: 100%;
+    height: 90%;
+    background-color: var(--palette-cornsik);
 }
 
 .field-textarea {
+    width: calc(100% - 5px);
+    height: 100%;
     white-space: pre-wrap;
-    padding: 5px;
 }
 
 .field-toolbar {
-    position: absolute;
     display: flex;
     justify-content: center;
-    border: 1px solid;
-    border-bottom: none;
     width: 100%;
+    background-color: var(--palette-red);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    opacity: 1;
+    transition: opacity .5s, transform 1s;
 }
 
 .field-toolbar > * {
@@ -99,7 +115,9 @@ const templateString = `
         <!--<img title="Hyperlink" onclick="var sLnk=prompt('Write the URL here','http:\/\/');if(sLnk&&sLnk!=''&&sLnk!='http://'){formatDoc('createlink',sLnk)}" src="data:image/gif;base64,R0lGODlhFgAWAOMKAB1ChDRLY19vj3mOrpGjuaezxrCztb/I19Ha7Pv8/f///////////////////////yH5BAEKAA8ALAAAAAAWABYAAARY8MlJq7046827/2BYIQVhHg9pEgVGIklyDEUBy/RlE4FQF4dCj2AQXAiJQDCWQCAEBwIioEMQBgSAFhDAGghGi9XgHAhMNoSZgJkJei33UESv2+/4vD4TAQA7" />-->
         <img title="Cut" id="field-cut" src="data:image/gif;base64,R0lGODlhFgAWAIQSAB1ChBFNsRJTySJYwjljwkxwl19vj1dusYODhl6MnHmOrpqbmpGjuaezxrCztcDCxL/I18rL1P///////////////////////////////////////////////////////yH5BAEAAB8ALAAAAAAWABYAAAVu4CeOZGmeaKqubDs6TNnEbGNApNG0kbGMi5trwcA9GArXh+FAfBAw5UexUDAQESkRsfhJPwaH4YsEGAAJGisRGAQY7UCC9ZAXBB+74LGCRxIEHwAHdWooDgGJcwpxDisQBQRjIgkDCVlfmZqbmiEAOw==" />
    </div>
-  <div class="field-textarea" contenteditable spellcheck="false">
+   <divi class="field-textarea-wrapper">
+      <div class="field-textarea" contenteditable="true" spellcheck="false">
+   </div>
   </div>
 </div>`;
 
@@ -159,8 +177,8 @@ class FieldView extends PartView {
         this.setUpToolbar();
         // we hide the toolbar by default and open it only when the halo is open
         let toolbar = this._shadowRoot.querySelector('.field-toolbar');
-        toolbar.style.top = `${toolbar.clientHeight + 5}px`;
-        toolbar.style.visibility = "hidden";
+        // toolbar.style.top = `${toolbar.clientHeight + 5}px`;
+        // toolbar.style.visibility = "hidden";
         // prevent the default tab key to leave focus on the field
         this.addEventListener("keydown", (event) => {
             if(event.key==="Tab"){
@@ -376,12 +394,13 @@ class FieldView extends PartView {
     toggleMode(){
         // we hide the toolbar by default and open it only when the halo is open
         let toolbar = this._shadowRoot.querySelector('.field-toolbar');
-        if (toolbar.style.visibility === "hidden"){
-            toolbar.style.visibility = "unset";
-            toolbar.style.top = `-${toolbar.clientHeight + 5}px`;
+        let textarea = this._shadowRoot.querySelector('.field-textarea');
+        if (toolbar.style.opacity === "0"){
+            toolbar.style.opacity = "1";
+            textarea.setAttribute("contenteditable", "true");
         } else {
-            toolbar.style.visibility = "hidden";
-            toolbar.style.top = `${toolbar.clientHeight + 5}px`;
+            toolbar.style.opacity = "0";
+            textarea.setAttribute("contenteditable", "false");
         }
         let currentMode = this.getAttribute('mode');
         let nextMode = 'viewing'; // By default, set to viewing
