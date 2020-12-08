@@ -125,7 +125,6 @@ class ColorWheelWidget extends HTMLElement {
         if(this.isConnected){
             this.canvas = this.shadowRoot.querySelector('canvas');
             this.bar = this.shadowRoot.getElementById('palette-bar');
-            this.closeButton = this.shadowRoot.getElementById('close-button');
             // give the widget a title if provided
             if(this.name){
                 this.shadowRoot.getElementById('palette-title').innerText = this.name;
@@ -138,7 +137,6 @@ class ColorWheelWidget extends HTMLElement {
             Array.from(this.shadowRoot.querySelectorAll('.recent-color-item')).forEach(el => {
                 el.addEventListener('click', this.onItemClick);
             });
-            this.closeButton.addEventListener('click', () => {this.onClose()});
 
             // Draw the color wheel to the canvas
             this._drawWheel();
@@ -152,7 +150,6 @@ class ColorWheelWidget extends HTMLElement {
         Array.from(this.shadowRoot.querySelector('.recent-color-item')).forEach(el => {
             el.removeEventListener('click', this.onItemClick);
         });
-        this.closeButton.removeEventListener('click', () => {this.onClose()});
     }
 
 
@@ -255,7 +252,7 @@ class ColorWheelWidget extends HTMLElement {
     }
 
     onClose(event){
-        this.style.display = "none";
+        this.remove();
     }
 
     _drawWheel(){
