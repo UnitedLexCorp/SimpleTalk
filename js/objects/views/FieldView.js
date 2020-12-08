@@ -22,24 +22,6 @@ const haloModeButtonSVG = `
 </svg>
 `;
 
-const colorSwatchButton =`
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-color-swatch" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M19 3h-4a2 2 0 0 0 -2 2v12a4 4 0 0 0 8 0v-12a2 2 0 0 0 -2 -2" />
-  <path d="M13 7.35l-2 -2a2 2 0 0 0 -2.828 0l-2.828 2.828a2 2 0 0 0 0 2.828l9 9" />
-  <path d="M7.3 13h-2.3a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h12" />
-  <line x1="17" y1="17" x2="17" y2="17.01" />
-</svg>
-`
-
-const colorPickerButton = `
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-color-picker" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <line x1="11" y1="7" x2="17" y2="13" />
-  <path d="M5 19v-4l9.7 -9.7a1 1 0 0 1 1.4 0l2.6 2.6a1 1 0 0 1 0 1.4l-9.7 9.7h-4" />
-</svg>
-`
-
 const templateString = `
 <style>
 .field {
@@ -67,6 +49,7 @@ const templateString = `
     width: calc(100% - 5px);
     height: 100%;
     white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 .field-toolbar {
@@ -269,23 +252,22 @@ class FieldView extends PartView {
         // this way anything that depends on the underlying content can
         // access it directly
         this.onPropChange('htmlContent', (value, id) => {
-            let textArea = this._shadowRoot.querySelector('.field-textarea');
             this.model.partProperties.setPropertyNamed(
                 this.model,
                 'textContent',
-                this.htmlToText(textArea)
+                this.htmlToText(this.textarea)
             );
         });
         this.onPropChange('mode', (value, id) => {
-            let textArea = this._shadowRoot.querySelector('.field-textarea');
             this.toggleMode(value);
         });
     }
 
     afterConnected(){
-        let textArea = this._shadowRoot.querySelector('.field-textarea');
-        textArea.addEventListener('input', this.onInput);
-        textArea.focus();
+        this.textarea = this._shadowRoot.querySelector('.field-textarea');
+        this.textareaWrapper = this._shadowRoot.querySelector('.field-textarea-wrapper');
+        this.textarea.addEventListener('input', this.onInput);
+        this.textarea.focus();
         // document.execCommand("defaultParagraphSeparator", false, "br");
         this.setUpToolbar();
         // prevent the default tab key to leave focus on the field
@@ -302,25 +284,24 @@ class FieldView extends PartView {
     }
 
     afterDisconnected(){
-        let textArea = this._shadowRoot.querySelector('.field-textarea');
-        textArea.removeEventListener('input', this.onInput);
+        this.textarea.removeEventListener('input', this.onInput);
         this.removeEventListener('click', this.onClick);
     }
 
     afterModelSet(){
-        // If we have a model, set the value of the textArea
+        // If we have a model, set the value of the textarea
         // to the current text of the field model
-        let textArea = this._shadowRoot.querySelector('.field-textarea');
+        this.textarea = this._shadowRoot.querySelector('.field-textarea');
         let htmlContent = this.model.partProperties.getPropertyNamed(
             this.model,
             'htmlContent'
         );
-        textArea.innerHTML = htmlContent;
+        this.textarea.innerHTML = htmlContent;
         // set the textContent property
         this.model.partProperties.setPropertyNamed(
             this.model,
             'textContent',
-            this.htmlToText(textArea)
+            this.htmlToText(this.textarea)
         );
         // set the editing mode
         let mode = this.model.partProperties.getPropertyNamed(this.model, "mode");
@@ -328,7 +309,6 @@ class FieldView extends PartView {
     }
 
     setUpToolbar(){
-        let textArea = this._shadowRoot.querySelector('.field-textarea');
         let toolbar = this._shadowRoot.querySelector('.field-toolbar');
         toolbar.childNodes.forEach((node) => {
             // current id contains the command and the value, maybe this is too implicit
@@ -346,10 +326,9 @@ class FieldView extends PartView {
     }
 
     _toolbarHandler(event, command, value){
-        let textArea = this._shadowRoot.querySelector('.field-textarea');
         if(command === "clean"){
             if(confirm('Are you sure?')){
-                textArea.innerHTML = "";
+                this.textarea.innerHTML = "";
             };
             return true;
         } else if(["fontsize", "fontname"].indexOf(command) > -1){
@@ -365,9 +344,9 @@ class FieldView extends PartView {
         this.model.partProperties.setPropertyNamed(
             this.model,
             'htmlContent',
-            this.htmlToText(textArea)
+            this.htmlToText(this.textarea)
         );
-        textArea.focus();
+        this.textarea.focus();
     }
 
     openColorWheelWidget(event, command){
@@ -386,14 +365,12 @@ class FieldView extends PartView {
     }
 
     onColorSelected(event){
-        console.log(event);
         let command = event.target.getAttribute("selector-command");
         let colorInfo = event.detail;
         let colorStr = `rgba(${colorInfo.r}, ${colorInfo.g}, ${colorInfo.b}, ${colorInfo.alpha})`;
         // document.execCommand(command, false, colorStr);
         // TODO maybe this should be a partProperty
-        let textArea = this._shadowRoot.querySelector('.field-textarea-wrapper');
-        textArea.style[command] = colorStr;
+        this.textareaWrapper.style[command] = colorStr;
     }
 
     // I set the selected editor mode, removing or adding corresponding
@@ -403,12 +380,11 @@ class FieldView extends PartView {
         let display = "inherit";
         this.editorCompleter = undefined;
         // spellcheck
-        let textArea = this._shadowRoot.querySelector('.field-textarea');
-        textArea.setAttribute("spellcheck", "true");
+        this.textarea.setAttribute("spellcheck", "true");
         if(mode === "SimpleTalk"){
             display = "none";
             // this.editorCompleter = this.simpleTalkCompleter;
-            textArea.setAttribute("spellcheck", "false");
+            this.textarea.setAttribute("spellcheck", "false");
         }
         toolbarElementNames.forEach((name) => {
             let idSelector = "#field-" + name;
@@ -556,13 +532,12 @@ class FieldView extends PartView {
      */
     toggleMode(mode){
         let toolbar = this._shadowRoot.querySelector('.field-toolbar');
-        let textarea = this._shadowRoot.querySelector('.field-textarea');
         if(mode === "viewing"){
             toolbar.style.opacity = "0";
-            textarea.setAttribute("contenteditable", "false");
+            this.textarea.setAttribute("contenteditable", "false");
         } else if(mode === "editing") {
             toolbar.style.opacity = "1";
-            textarea.setAttribute("contenteditable", "true");
+            this.textarea.setAttribute("contenteditable", "true");
         } else {
             throw `Unkown field mode ${mode}`;
         }

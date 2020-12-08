@@ -1083,16 +1083,17 @@ System._commandHandlers['openToolbox'] = function(senders, targetId){
         'name',
         'Add Field to Card'
     );
-    addFieldBtn._commandHandlers['click'] = function(){
-        let currentCardView = document.querySelector('.current-stack > .current-card');
-        let cardModel = currentCardView.model;
-        let newField = System.newModel('field', cardModel.id);
-        newField.partProperties.setPropertyNamed(
-            newField,
-            'name',
-            `Field ${newField.id}`
-        );
-    };
+    let addFieldBtnScript = 'on click\n    add field to current card\nend click';
+    addFieldBtn.partProperties.setPropertyNamed(
+        addFieldBtn,
+        'script',
+        addFieldBtnScript
+    );
+    System.sendMessage(
+        {type: "compile", codeString: addFieldBtnScript, targetId: addFieldBtn.id},
+        System,
+        System
+    );
 
 };
 
