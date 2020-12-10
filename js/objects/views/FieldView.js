@@ -47,6 +47,7 @@ const templateString = `
 
 .field-textarea {
     width: calc(100% - 5px);
+    font-family: monospace;
     height: 100%;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
