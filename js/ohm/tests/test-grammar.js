@@ -536,31 +536,59 @@ describe("SimpleTalk Grammar", () => {
                 semanticMatchFailTest(s, "Command");
             });
         });
-        describe("Listen For", () => {
-            it ("listen for click in button", () => {
-                const s = 'listen for "click" in this button';
+        describe("Respond To", () => {
+            it ("respond to click in button", () => {
+                const s = 'respond to "click" in this button';
                 semanticMatchTest(s, "Command");
-                semanticMatchTest(s, "Command_eventListen");
+                semanticMatchTest(s, "Command_eventRespond");
                 semanticMatchTest(s, "Statement");
             });
-            it ("listen for customEvent in button", () => {
-                const s = 'listen for "customEvent" in this button';
+            it ("respond to customEvent in button", () => {
+                const s = 'respond to "customEvent" in this button';
                 semanticMatchTest(s, "Command");
-                semanticMatchTest(s, "Command_eventListen");
+                semanticMatchTest(s, "Command_eventRespond");
                 semanticMatchTest(s, "Statement");
             });
-            it ("listen for customEvent in named card", () => {
-                const s = 'listen for "customEvent" in card "new card"';
+            it ("respond to customEvent in named card", () => {
+                const s = 'respond to "customEvent" in card "new card"';
                 semanticMatchTest(s, "Command");
-                semanticMatchTest(s, "Command_eventListen");
+                semanticMatchTest(s, "Command_eventRespond");
                 semanticMatchTest(s, "Statement");
             });
             it ("Bad construction (no quotes)", () => {
-                const s = 'listen for click in this button';
+                const s = 'respond to click in this button';
                 semanticMatchFailTest(s, "Command");
             });
             it ("Bad construction (bad target)", () => {
-                const s = 'listen for "click" in this noObject';
+                const s = 'respond to "click" in this noObject';
+                semanticMatchFailTest(s, "Command");
+            });
+        });
+        describe("Ignore", () => {
+            it ("ignore click in button", () => {
+                const s = 'ignore "click" in this button';
+                semanticMatchTest(s, "Command");
+                semanticMatchTest(s, "Command_eventIgnore");
+                semanticMatchTest(s, "Statement");
+            });
+            it ("ignore customEvent in button", () => {
+                const s = 'ignore "customEvent" in this button';
+                semanticMatchTest(s, "Command");
+                semanticMatchTest(s, "Command_eventIgnore");
+                semanticMatchTest(s, "Statement");
+            });
+            it ("ignore customEvent in named card", () => {
+                const s = 'ignore "customEvent" in card "new card"';
+                semanticMatchTest(s, "Command");
+                semanticMatchTest(s, "Command_eventIgnore");
+                semanticMatchTest(s, "Statement");
+            });
+            it ("Bad construction (no quotes)", () => {
+                const s = 'ignore click in this button';
+                semanticMatchFailTest(s, "Command");
+            });
+            it ("Bad construction (bad target)", () => {
+                const s = 'ignore "click" in this noObject';
                 semanticMatchFailTest(s, "Command");
             });
         });
