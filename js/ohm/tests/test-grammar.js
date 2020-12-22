@@ -536,6 +536,34 @@ describe("SimpleTalk Grammar", () => {
                 semanticMatchFailTest(s, "Command");
             });
         });
+        describe("Listen For", () => {
+            it ("listen for click in button", () => {
+                const s = 'listen for "click" in this button';
+                semanticMatchTest(s, "Command");
+                semanticMatchTest(s, "Command_eventListen");
+                semanticMatchTest(s, "Statement");
+            });
+            it ("listen for customEvent in button", () => {
+                const s = 'listen for "customEvent" in this button';
+                semanticMatchTest(s, "Command");
+                semanticMatchTest(s, "Command_eventListen");
+                semanticMatchTest(s, "Statement");
+            });
+            it ("listen for customEvent in named card", () => {
+                const s = 'listen for "customEvent" in card "new card"';
+                semanticMatchTest(s, "Command");
+                semanticMatchTest(s, "Command_eventListen");
+                semanticMatchTest(s, "Statement");
+            });
+            it ("Bad construction (no quotes)", () => {
+                const s = 'listen for click in this button';
+                semanticMatchFailTest(s, "Command");
+            });
+            it ("Bad construction (bad target)", () => {
+                const s = 'listen for "click" in this noObject';
+                semanticMatchFailTest(s, "Command");
+            });
+        });
         describe("Arbitrary", () => {
             it ("arbitrary command", () => {
                 const s = "anythinggoes";
