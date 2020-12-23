@@ -187,6 +187,13 @@ class Part {
             new BasicProperty(
                 'backgroundColor',
                 'white'
+            ),
+            // List of (web) events the part subscribes to
+            new BasicProperty(
+                'events',
+                new Set(),
+                false,
+                []
             )
         ];
         basicProps.forEach(prop => {
@@ -202,6 +209,28 @@ class Part {
             },
             true, // Is readOnly,
             [] // No aliases
+        );
+
+        this.partProperties.newDynamicProp(
+            "eventRespond",
+            function(propOwner, propObject, value){
+                let eventsProperty = propOwner.partProperties.findPropertyNamed("events");
+                let events = eventsProperty.getValue(propOwner);
+                events.add(value);
+                eventsProperty.setValue(propOwner, events, false); // no need to notify
+            },
+            function(){return} // no getter
+        );
+
+        this.partProperties.newDynamicProp(
+            "eventIgnore",
+            function(propOwner, propObject, value){
+                let eventsProperty = propOwner.partProperties.findPropertyNamed("events");
+                let events = eventsProperty.getValue(propOwner);
+                events.delete(value);
+                eventsProperty.setValue(propOwner, events, false); // no need to notify
+            },
+            function(){return} // no getter
         );
     }
 

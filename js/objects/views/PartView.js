@@ -36,6 +36,8 @@ class PartView extends HTMLElement {
         this.primHandlePropChange = this.primHandlePropChange.bind(this);
         this.onPropChange = this.onPropChange.bind(this);
         this.scriptChanged = this.scriptChanged.bind(this);
+        this.eventRespond = this.eventRespond.bind(this);
+        this.eventIgnore = this.eventIgnore.bind(this);
 
         // Bind Halo related methods
         this.openHalo = this.openHalo.bind(this);
@@ -89,6 +91,8 @@ class PartView extends HTMLElement {
         // Do not override this method
         // TODO: Implement the universals
         this.onPropChange('script', this.scriptChanged);
+        this.onPropChange('eventRespond', this.eventRespond);
+        this.onPropChange('eventIgnore', this.eventIgnore);
     }
 
     sendMessage(aMessage, target){
@@ -128,6 +132,33 @@ class PartView extends HTMLElement {
             codeString: value,
             targetId: partId
         }, window.System);
+    }
+
+    // add the event to "event" property and an event listener to the DOM
+    // element which will send a corresponding message
+    eventRespond(value, partId){
+        // add a eventListener 
+        let view = window.System.findViewById(partId);
+        //view.addEventListener(value, (value, view) => {this._sendEventMessage});
+        view.addEventListener(value, () => {console.log(`event ${value} fired`)});
+    }
+
+    // remove the event from "event" property and the event listener from
+    // the DOM element
+    eventIgnore(value, partId){
+        // remove eventListener
+        let view = window.System.findViewById(partId);
+        view.removeEventListener(value, this._sendEventMessage);
+    }
+
+    _sendEventMessage(eventName, view){
+        let message = {
+            type: "command",
+            commandName: eventName,
+            args: [],
+            shouldIgnore: true
+        }
+        view.model.sendMessage(messagem, this.model);
     }
 
     openToolbox(){
