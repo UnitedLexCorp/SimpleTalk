@@ -70,3 +70,36 @@ describe('Test use of #onPropChange registration', () => {
         );
     });
 });
+
+describe('Test event partProperty handling', () => {
+    let testView;
+    let testModel;
+    testView = document.createElement('st-test');
+    testModel = new TestPart();
+    testView.setModel(testModel);
+    it('Initial "events" property is an empty Map object', () => {
+        let events = testModel.partProperties.getPropertyNamed(testModel, "events");
+        assert.equal(events.size, 0);
+    });
+    it('Initial "events" property is an empty Map object', () => {
+        let events = testModel.partProperties.getPropertyNamed(testModel, "events");
+        assert.equal(events.size, 0);
+    });
+    it('Setting an "eventRespond" property adds to the "events" property', () => {
+        let eventRespond = testModel.partProperties.findPropertyNamed("eventRespond");
+        assert.exists(eventRespond);
+        eventRespond.setValue(testModel, "click");
+        let events = testModel.partProperties.getPropertyNamed(testModel, "events");
+        assert.equal(1, events.size);
+        assert.exists(events.get("click"));
+        assert.equal("function", typeof events.get("click"));
+    });
+    it('Setting an "eventIgnore" property removes from the "events" property', () => {
+        let eventIgnore = testModel.partProperties.findPropertyNamed("eventIgnore");
+        assert.exists(eventIgnore);
+        eventIgnore.setValue(testModel, "click");
+        let events = testModel.partProperties.getPropertyNamed(testModel, "events");
+        assert.equal(0, events.size);
+        assert.notExists(events.get("click"));
+    });
+});

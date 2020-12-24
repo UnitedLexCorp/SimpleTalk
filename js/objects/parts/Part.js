@@ -5,6 +5,7 @@
  * SimpleTalk parts.
  */
 import idMaker from '../utils/idMaker.js';
+import eventMessenger from '../utils/eventMessenger.js';
 import {
     PartProperties,
     BasicProperty,
@@ -191,7 +192,7 @@ class Part {
             // List of (web) events the part subscribes to
             new BasicProperty(
                 'events',
-                new Set(),
+                new Map(),
                 false,
                 []
             )
@@ -202,7 +203,6 @@ class Part {
 
         this.partProperties.newDynamicProp(
             'number',
-
             null, // No setter; readOnly
             function(propOwner, propObject){
                 return propOwner.subparts.indexOf(this);
@@ -216,8 +216,8 @@ class Part {
             function(propOwner, propObject, value){
                 let eventsProperty = propOwner.partProperties.findPropertyNamed("events");
                 let events = eventsProperty.getValue(propOwner);
-                events.add(value);
-                eventsProperty.setValue(propOwner, events, false); // no need to notify
+                events.set(value, (value, propOwner) => eventMessanger);
+                eventsProperty.setValue(propOwner, events, false);
             },
             function(){return} // no getter
         );
