@@ -136,19 +136,19 @@ class PartView extends HTMLElement {
 
     // add the event to "event" property and an event listener to the DOM
     // element which will send a corresponding message
-    eventRespond(value, partId){
-        // add a eventListener 
-        let view = window.System.findViewById(partId);
-        //view.addEventListener(value, (value, view) => {this._sendEventMessage});
-        view.addEventListener(value, () => {console.log(`event ${value} fired`)});
+    eventRespond(eventName, partId){
+        // grab the corresponding event handler from the "events" property
+        // and add it to the DOM element
+        let events = this.model.partProperties.getPropertyNamed(this.model, "events");
+        console.log(events.get(eventName))
+        this[`on${eventName}`] = events.get(eventName);
     }
 
     // remove the event from "event" property and the event listener from
     // the DOM element
-    eventIgnore(value, partId){
+    eventIgnore(eventName, partId){
         // remove eventListener
-        let view = window.System.findViewById(partId);
-        view.removeEventListener(value, this._sendEventMessage);
+        this[`on${eventName}`] = null;
     }
 
     _sendEventMessage(eventName, view){

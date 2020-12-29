@@ -216,7 +216,7 @@ class Part {
             function(propOwner, propObject, value){
                 let eventsProperty = propOwner.partProperties.findPropertyNamed("events");
                 let events = eventsProperty.getValue(propOwner);
-                events.set(value, (value, propOwner) => eventMessanger);
+                events.set(value, (value, propOwner) => eventMessenger);
                 eventsProperty.setValue(propOwner, events, false);
             },
             function(){return} // no getter
