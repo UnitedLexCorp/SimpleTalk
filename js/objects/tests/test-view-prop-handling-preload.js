@@ -77,6 +77,11 @@ describe('Test event partProperty handling', () => {
     testView = document.createElement('st-test');
     testModel = new TestPart();
     testView.setModel(testModel);
+    // event callback helpers
+    let result = 0;
+    let clickHandler = function(){
+        result += 1;
+    };
     it('Initial "events" property is an empty Map object', () => {
         let events = testModel.partProperties.getPropertyNamed(testModel, "events");
         assert.equal(events.size, 0);
@@ -93,42 +98,17 @@ describe('Test event partProperty handling', () => {
         );
         let events = testModel.partProperties.getPropertyNamed(testModel, "events");
         assert.equal(1, events.size);
-        assert.exists(events.get("click"));
-        assert.equal("function", typeof events.get("click"));
+        assert.exists(events.has("click"));
     });
     it('Setting an "eventRespond" property sets the "on[event]" attribute on the view DOM element', () => {
         assert.isNotNull(testView["onclick"]);
         assert.equal("function", typeof testView["onclick"]);
     });
     it('Dispatching the event', () => {
+        testModel._commandHandlers["click"] = clickHandler;
         let event = new window.MouseEvent('click');
-        assert.doesNotThrow(testView["onclick"]);
-    });
-    it('Setting a custom handler for an event overwrites the previous one', () => {
-        let result = 0;
-        let clickHandler = function(){
-            results = 1;
-        }
-        let customEvents = new Map();
-        customEvents.set("click", clickHandler)
-        testModel.partProperties.setPropertyNamed(
-            testModel,
-            "events",
-            customEvents
-        );
-        testModel.partProperties.setPropertyNamed(
-            testModel,
-            'eventRespond',
-            "click"
-        );
-
-        assert.isNotNull(testView["onclick"]);
-        assert.equal("function", typeof testView["onclick"]);
-        assert.equal("clickHandler", testView["onclick"].name);
-    });
-    it('Dispatching the event', () => {
-        let event = new window.MouseEvent('click');
-        assert.doesNotThrow(testView["onclick"]);
+        assert.doesNotThrow(() => testView.dispatchEvent(event));
+        assert.equal(1, result);
     });
     it('Setting an "eventIgnore" property removes from the "events" property', () => {
         testModel.partProperties.setPropertyNamed(
@@ -137,10 +117,15 @@ describe('Test event partProperty handling', () => {
             "click"
         );
         let events = testModel.partProperties.getPropertyNamed(testModel, "events");
+        assert.isFalse(events.has("click"));
         assert.equal(0, events.size);
-        assert.notExists(events.get("click"));
     });
     it('Setting an "eventIgnore" property removes "on[event] attribute from the view DOM element', () => {
         assert.isNull(testView["onclick"]);
+    });
+    it('Dispatching a removed event does not throw an error and does not do anything', () => {
+        let event = new window.MouseEvent('click');
+        assert.doesNotThrow(() => testView.dispatchEvent(event));
+        assert.equal(1, result);
     });
 });

@@ -136,12 +136,14 @@ class PartView extends HTMLElement {
 
     // add the event to "event" property and an event listener to the DOM
     // element which will send a corresponding message
-    eventRespond(eventName, partId){
-        // grab the corresponding event handler from the "events" property
-        // and add it to the DOM element
-        let events = this.model.partProperties.getPropertyNamed(this.model, "events");
-        console.log(events.get(eventName))
-        this[`on${eventName}`] = events.get(eventName);
+    eventRespond(eventName){
+        let message = {
+            type: "command",
+            commandName: eventName,
+            args: [],
+            shouldIgnore: true
+        };
+        this[`on${eventName}`] = () => this.sendMessage(message, this.model);
     }
 
     // remove the event from "event" property and the event listener from
@@ -149,16 +151,6 @@ class PartView extends HTMLElement {
     eventIgnore(eventName, partId){
         // remove eventListener
         this[`on${eventName}`] = null;
-    }
-
-    _sendEventMessage(eventName, view){
-        let message = {
-            type: "command",
-            commandName: eventName,
-            args: [],
-            shouldIgnore: true
-        }
-        view.model.sendMessage(messagem, this.model);
     }
 
     openToolbox(){

@@ -192,7 +192,7 @@ class Part {
             // List of (web) events the part subscribes to
             new BasicProperty(
                 'events',
-                new Map(),
+                new Set(),
                 false,
                 []
             )
@@ -211,12 +211,15 @@ class Part {
             [] // No aliases
         );
 
+        // eventResopnd and eventIgnore are "helper" dynamic props
+        // they add and delete eventNamed from the "events" basic property
+        // hence, they do not need getters
         this.partProperties.newDynamicProp(
             "eventRespond",
             function(propOwner, propObject, value){
                 let eventsProperty = propOwner.partProperties.findPropertyNamed("events");
                 let events = eventsProperty.getValue(propOwner);
-                events.set(value, (value, propOwner) => eventMessenger);
+                events.add(value);
                 eventsProperty.setValue(propOwner, events, false);
             },
             function(){return} // no getter
