@@ -73,6 +73,11 @@ class PartView extends HTMLElement {
         this.model = aModel;
         aModel.addPropertySubscriber(this);
         this.setAttribute('part-id', aModel.id);
+        // set onevent DOM element handlers for events property
+        // NOTE: run here as opposed to in this.connectedCallback() because
+        // the latter can technically be invoked before the model is set
+        let events = this.model.partProperties.getPropertyNamed(this.model, "events");
+        events.forEach((eventRespond) => this.eventRespond(eventRespond));
         this.afterModelSet();
     }
 

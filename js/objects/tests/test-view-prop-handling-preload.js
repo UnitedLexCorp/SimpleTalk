@@ -76,56 +76,71 @@ describe('Test event partProperty handling', () => {
     let testModel;
     testView = document.createElement('st-test');
     testModel = new TestPart();
+    let defaultEvents = new Set();
+    defaultEvents.add("click");
+    testModel.partProperties.setPropertyNamed(testModel, "events", defaultEvents);
     testView.setModel(testModel);
     // event callback helpers
-    let result = 0;
+    let clickResult = 0;
     let clickHandler = function(){
-        result += 1;
+        clickResult += 1;
     };
-    it('Initial "events" property is an empty Map object', () => {
+    testModel._commandHandlers["click"] = clickHandler;
+    let mouseOverResult = 0;
+    it('Initial "events" property is a Set with one element: "click"', () => {
         let events = testModel.partProperties.getPropertyNamed(testModel, "events");
-        assert.equal(events.size, 0);
+        assert.isTrue(events.has("click"));
+        assert.equal(1, events.size);
+        assert.isTrue(events instanceof Set);
     });
-    it('Initial "events" property is an empty Map object', () => {
-        let events = testModel.partProperties.getPropertyNamed(testModel, "events");
-        assert.equal(events.size, 0);
+    it('The "onclick" attribute is set on the view DOM element', () => {
+        assert.isNotNull(testView["onclick"]);
+        assert.equal("function", typeof testView["onclick"]);
+    });
+    it('Dispatching the "click" event', () => {
+        let event = new window.MouseEvent('click');
+        assert.doesNotThrow(() => testView.dispatchEvent(event));
+        assert.equal(1, clickResult);
     });
     it('Setting an "eventRespond" property adds to the "events" property', () => {
         testModel.partProperties.setPropertyNamed(
             testModel,
             'eventRespond',
-            "click"
+            "mouseover"
         );
         let events = testModel.partProperties.getPropertyNamed(testModel, "events");
-        assert.equal(1, events.size);
-        assert.exists(events.has("click"));
+        // assert.exists(events.has("mouseover"));
+        assert.equal(2, events.size);
     });
     it('Setting an "eventRespond" property sets the "on[event]" attribute on the view DOM element', () => {
-        assert.isNotNull(testView["onclick"]);
-        assert.equal("function", typeof testView["onclick"]);
+        assert.isNotNull(testView["onmouseover"]);
+        assert.equal("function", typeof testView["onmouseover"]);
     });
     it('Dispatching the event', () => {
-        testModel._commandHandlers["click"] = clickHandler;
-        let event = new window.MouseEvent('click');
+        let mouseoverHandler = function(){
+            mouseOverResult += 1;
+        };
+        testModel._commandHandlers["mouseover"] = mouseoverHandler;
+        let event = new window.MouseEvent('mouseover');
         assert.doesNotThrow(() => testView.dispatchEvent(event));
-        assert.equal(1, result);
+        assert.equal(1, mouseOverResult);
     });
     it('Setting an "eventIgnore" property removes from the "events" property', () => {
         testModel.partProperties.setPropertyNamed(
             testModel,
             'eventIgnore',
-            "click"
+            "mouseover"
         );
         let events = testModel.partProperties.getPropertyNamed(testModel, "events");
-        assert.isFalse(events.has("click"));
-        assert.equal(0, events.size);
+        assert.isFalse(events.has("mouseover"));
+        assert.equal(1, events.size);
     });
     it('Setting an "eventIgnore" property removes "on[event] attribute from the view DOM element', () => {
-        assert.isNull(testView["onclick"]);
+        assert.isNull(testView["onmouseover"]);
     });
     it('Dispatching a removed event does not throw an error and does not do anything', () => {
-        let event = new window.MouseEvent('click');
+        let event = new window.MouseEvent('mouseover');
         assert.doesNotThrow(() => testView.dispatchEvent(event));
-        assert.equal(1, result);
+        assert.equal(1, mouseOverResult);
     });
 });
