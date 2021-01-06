@@ -35,6 +35,13 @@ class WorldStack extends Part {
         // Set the id property to always
         // be 'world'
         this.id = 'world';
+
+        // global variables
+        this._global = {};
+
+        // bind methods
+        this.setGlobal = this.setGlobal.bind(this);
+        this.getGlobal = this.getGlobal.bind(this);
     }
 
     get type(){
@@ -87,6 +94,16 @@ class WorldStack extends Part {
     // 'handlers of last resort'
     delegateMessage(aMessage){
         return this.sendMessage(aMessage, window.System);
+    }
+
+    // Setting and getting of global objects
+    setGlobal(name, value){
+        this._global[name] = value;
+        return value;
+    }
+
+    getGlobal(name){
+        return this._global[name];
     }
 };
 

@@ -17,10 +17,12 @@ describe('Basic ExecutionContext variable tests', () => {
         '\n',
         'on myOtherHandler',
         '\tput 1 into myVariable',
+        '\tput 10 into global myGlobalVariable',
         'end myOtherHandler'
     ].join('\n');
 
     let currentCard = System.getCurrentCardModel();
+    let worldStack = System.getWorldStackModel();
 
     it('Can compile the test script on current card', () => {
         let msg = {
@@ -69,5 +71,9 @@ describe('Basic ExecutionContext variable tests', () => {
     it('Still has correct value for previous handler\'s variable', () => {
         let value = currentCard._executionContext._lookup['myCustomHandler']['myVariable'];
         assert.equal(value, 3);
+    });
+    it('Has correct value for global myGlobalVariable', () => {
+        let value = worldStack.getGlobal('myGlobalVariable');
+        assert.equal(value, 10);
     });
 });

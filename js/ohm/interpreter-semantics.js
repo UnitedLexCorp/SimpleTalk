@@ -13,13 +13,13 @@ const createInterpreterSemantics = (partContext, systemContext) => {
                 }
                 this._executionContext.current = messageName;
                 this._executionContext.current._argVariableNames = parameters;
-                
+
                 // Map each arg in order to any variable names given
                 // to it. We set these as local variables
                 args.forEach((arg, index) => {
                     let varName = this._executionContext.current._argVariableNames[index];
                     if(varName){
-                        this._executionContext.setLocal(varName, arg);
+                        this._executionContext.setLocal(varName, ar);
                     }
                 });
 
@@ -192,10 +192,15 @@ const createInterpreterSemantics = (partContext, systemContext) => {
             return msg;
         },
 
-        Command_putVariable: function(putLiteral, value, intoLiteral, destination){
+        Command_putVariable: function(putLiteral, value, intoLiteral, globalLiteral, destination){
+            let global = false;
+            if(globalLiteral.sourceString){
+                global = true;
+            };
             let args = [
                 value.interpret(),
-                destination.sourceString
+                destination.sourceString,
+                global
             ];
             let msg = {
                 type: "command",
