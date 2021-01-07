@@ -19,7 +19,7 @@ const createInterpreterSemantics = (partContext, systemContext) => {
                 args.forEach((arg, index) => {
                     let varName = this._executionContext.current._argVariableNames[index];
                     if(varName){
-                        this._executionContext.setLocal(varName, ar);
+                        this._executionContext.setLocal(varName, arg);
                     }
                 });
 
