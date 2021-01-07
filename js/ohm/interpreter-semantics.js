@@ -445,7 +445,7 @@ const createInterpreterSemantics = (partContext, systemContext) => {
             }
             return int; 
         },
-        
+
         floatLiteral: function(negativeSign, onesPlace, decimal, restPlace){
             let floatString = `${onesPlace.sourceString}.${restPlace.sourceString}`;
             let hasNegative = (negativeSign.sourceString == "-");
@@ -459,11 +459,11 @@ const createInterpreterSemantics = (partContext, systemContext) => {
         variableName: function(letterPlus, optionalDigits){
             // Lookup the variable in the part's
             // current execution context
-            return partContext._executionContext.getLocal(this.sourceString);
+            return partContext._executionContext.get(this.sourceString);
         },
 
         _terminal(){
-            
+
         }
     };
 };
