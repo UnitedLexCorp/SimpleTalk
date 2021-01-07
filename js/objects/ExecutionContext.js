@@ -12,6 +12,7 @@ class ExecutionContext {
         this._current = null;
 
         // Bind methods
+        this.get = this.get.bind(this);
         this.getLocal = this.getLocal.bind(this);
         this.setLocal = this.setLocal.bind(this);
     }
@@ -24,8 +25,8 @@ class ExecutionContext {
         if(localValue !== undefined){
             return localValue;
         };
-        let worldStack = System.getWorldStackModel();
-        return worldStack.getGlobal(varName);
+        let worldStack = window.System.getWorldStackModel();
+        return worldStack._executionContext.getLocal(varName);
     }
 
     getLocal(varName){

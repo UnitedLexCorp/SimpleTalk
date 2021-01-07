@@ -864,7 +864,7 @@ System._commandHandlers['ask'] = function(senders, question){
 
 System._commandHandlers['putInto'] = function(senders, value, variableName, global){
     if(global){
-        System.getWorldStackModel().setGlobal(variableName, value);
+        System.getWorldStackModel()._executionContext.setLocal(variableName, value);
         return;
     }
     let originalSender = this.partsById[senders[0].id];

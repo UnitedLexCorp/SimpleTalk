@@ -73,7 +73,7 @@ describe('Basic ExecutionContext variable tests', () => {
         assert.equal(value, 3);
     });
     it('Has correct value for global myGlobalVariable', () => {
-        let value = worldStack.getGlobal('myGlobalVariable');
+        let value = worldStack._executionContext.getLocal('myGlobalVariable');
         assert.equal(value, 10);
     });
     it('Global variable not a local variable', () => {

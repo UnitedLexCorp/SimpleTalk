@@ -12,6 +12,7 @@
  * SimpleTalk environment.
  */
 import Part from './Part.js';
+import ExecutionContext from '../ExecutionContext.js';
 
 
 class WorldStack extends Part {
@@ -36,12 +37,9 @@ class WorldStack extends Part {
         // be 'world'
         this.id = 'world';
 
-        // global variables
-        this._global = {};
-
-        // bind methods
-        this.setGlobal = this.setGlobal.bind(this);
-        this.getGlobal = this.getGlobal.bind(this);
+        // global variables execution context
+        this._executionContext = new ExecutionContext();
+        this._executionContext.current = "global";
     }
 
     get type(){
@@ -94,16 +92,6 @@ class WorldStack extends Part {
     // 'handlers of last resort'
     delegateMessage(aMessage){
         return this.sendMessage(aMessage, window.System);
-    }
-
-    // Setting and getting of global objects
-    setGlobal(name, value){
-        this._global[name] = value;
-        return value;
-    }
-
-    getGlobal(name){
-        return this._global[name];
     }
 };
 
