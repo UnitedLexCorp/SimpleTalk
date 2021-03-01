@@ -15,6 +15,8 @@ class Field extends Part {
     constructor(owner, name){
         super(owner);
 
+        this.acceptedSubpartTypes = ["field"];
+
         this.isField = true;
 
         if(name){
@@ -24,13 +26,12 @@ class Field extends Part {
                 name
             );
         }
-        // some bs
 
         // Set the Field-specific
         // Part Properties
         this.partProperties.newBasicProp(
             'mode',
-            'editing'
+            'editing' //TODO this should be either "bravo" or "simpletalk"
         );
 
         this.partProperties.newBasicProp(
@@ -41,42 +42,32 @@ class Field extends Part {
             'textContent',
             ''
         );
-        this.partProperties.newBasicProp(
-            'autoSelect',
-            false,
-        );
-        this.partProperties.newBasicProp(
-            'autoTab',
-            false
-        );
+        // TODO this should replace mode
         this.partProperties.newBasicProp(
             'lockText',
             false
         );
-        this.partProperties.newBasicProp(
-            'showLines',
-            false
+        // A number of the props deal with direct text editing,
+        // and so they are like commands. Examples include "undo"
+        // "redo" "clear" etc. Here we use dynami props which the
+        // view can respond to accordingly, but having these props have
+        // no actual 'state'
+        this.partProperties.newDynamicProp(
+            "undo",
+            () => {}, // all we is a notification
+            () => {} // no getter
         );
-        this.partProperties.newBasicProp(
-            'dontWrap',
-            false
+        this.partProperties.newDynamicProp(
+            "redo",
+            () => {}, // all we is a notification
+            () => {} // no getter
         );
-        this.partProperties.newBasicProp(
-            'multipleLines',
-            false
+        this.partProperties.newDynamicProp(
+            "remove-format",
+            () => {}, // all we is a notification
+            () => {} // no getter
         );
-        this.partProperties.newBasicProp(
-            'scroll',
-            0
-        );
-        this.partProperties.newBasicProp(
-            'sharedText',
-            false
-        );
-        this.partProperties.newBasicProp(
-            'wideMargins',
-            false
-        );
+
         // Styling
         // setting width and height to null
         // effectively forces to the default size
@@ -116,6 +107,26 @@ class Field extends Part {
         this.partProperties.newStyleProp(
             'text-font',
             'default',
+        );
+        this.partProperties.newStyleProp(
+            'text-bold',
+            false,
+        );
+        this.partProperties.newStyleProp(
+            'text-italic',
+            false,
+        );
+        this.partProperties.newStyleProp(
+            'text-size',
+            'default',
+        );
+        this.partProperties.newStyleProp(
+            'text-underline',
+            false,
+        );
+        this.partProperties.newStyleProp(
+            'text-align',
+            "left",
         );
         this.partProperties.newStyleProp(
             'background-color',
