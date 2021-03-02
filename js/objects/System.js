@@ -39,6 +39,8 @@ import idMaker from './utils/idMaker.js';
 
 const video = document.createElement('video');
 const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+
 var handDetectionModel = null;
 
 const System = {
@@ -1430,26 +1432,44 @@ System._commandHandlers['tell'] = (senders, targetId, deferredMessage) => {
     targetPart.sendMessage(deferredMessage, targetPart);
 };
 
-System._commandHandlers['startVideo'] = () => {
-    if (video.srcObject !== null) {
-        return;
-    }
-    navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-        video.srcObject = stream;
-        video.play();
-    });
+const scaleDim = (dim) => {
+    const scale = 0.7;
+    const stride = 16;
+    const evenRes = dim * scale - 1;
+    return evenRes - (evenRes % stride) + 1;
 };
 
-System._commandHandlers['stopVideo'] = () => {
-    if (video.srcObject === null) {
-        return;
-    }
-    video.pause();
-    const tracks = video.srcObject.getTracks();
-    for (var i = 0; i < tracks.length; i++) {
-        tracks[i].stop();
-    }
-    video.srcObject = null;
+const detectHands = async (model, scaledWidth, scaledHeight) => {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const image = tf.tidy(() => {
+        return tf.fromPixels(canvas).resizeBilinear([scaledHeight, scaledWidth]).expandDims(0);
+    });
+    const [scores, tboxes] = await model.executeAsync(image);
+    image.dispose();
+    const handsDetected = tf.tidy(() => {
+        const indices = tf.image.nonMaxSuppression(
+            tboxes.reshape([tboxes.shape[1], tboxes.shape[3]]),
+            scores.reshape([scores.shape[1]]),
+            20,
+            0.5,
+            0.85).dataSync();
+        var boxes = [];
+        var idx;
+        for (let i = 0; i < indices.length; i++) {
+            idx = indices[i];
+            var score = scores.get(0, idx, 0);
+            // Original order is [minY, minX, maxY, maxX] so we reorder.
+            var box = {
+                upperLeft: [tboxes.get(0, idx, 0, 1), tboxes.get(0, idx, 0, 0)],
+                lowerRight: [tboxes.get(0, idx, 0, 3), tboxes.get(0, idx, 0, 2)]
+            };
+            boxes.push({score: score, box: box});
+        }
+        return {boxes: boxes, timestamp: Date.now()};
+    });
+    scores.dispose();
+    tboxes.dispose();
+    return handsDetected;
 };
 
 // https://aaronsmith.online/easily-load-an-external-script-using-javascript/
@@ -1478,6 +1498,15 @@ const loadHandDetectionModel = () => {
         ).then(model => {
             console.log("hand detection model loaded");
             handDetectionModel = model;
+        }).then(() => {
+            return navigator.mediaDevices.getUserMedia({ video: true });
+        }).then(stream => {
+            video.srcObject = stream;
+            return video.play();
+        }).then(() => {
+            console.log("video started");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
         }).catch(err => {
             console.log("error loading hand detection model");
             console.log(err);
@@ -1486,8 +1515,15 @@ const loadHandDetectionModel = () => {
 }
 
 const unloadHandDetectionModel = () => {
-    console.log("unloading hand detection model");
+    video.pause();
+    const tracks = video.srcObject.getTracks();
+    for (var i = 0; i < tracks.length; i++) {
+        tracks[i].stop();
+    }
+    video.srcObject = null;
+    console.log("video stopped");
     handDetectionModel = null;
+    console.log("unloading hand detection model");
 }
 
 System._commandHandlers['toggleHandDetection'] = () => {
@@ -1497,6 +1533,9 @@ System._commandHandlers['toggleHandDetection'] = () => {
         unloadHandDetectionModel();
     }
 };
+
+System.getVideo = () => { return video; }
+System.getCanvas = () => { return canvas; }
 
 /** Register the initial set of parts in the system **/
 System.registerPart('card', Card);
