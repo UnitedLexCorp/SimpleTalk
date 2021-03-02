@@ -42,6 +42,7 @@ const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 
 var handDetectionModel = null;
+var handDetectionRunning = false;
 
 const System = {
     name: "System",
@@ -1439,12 +1440,17 @@ const scaleDim = (dim) => {
     return evenRes - (evenRes % stride) + 1;
 };
 
-const detectHands = async (model, scaledWidth, scaledHeight) => {
+const detectHands = async () => {
+    if (!handDetectionRunning) {
+        return;
+    }
+    const scaledWidth = scaleDim(canvas.width);
+    const scaledHeight = scaleDim(canvas.height);
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const image = tf.tidy(() => {
         return tf.fromPixels(canvas).resizeBilinear([scaledHeight, scaledWidth]).expandDims(0);
     });
-    const [scores, tboxes] = await model.executeAsync(image);
+    const [scores, tboxes] = await handDetectionModel.executeAsync(image);
     image.dispose();
     const handsDetected = tf.tidy(() => {
         const indices = tf.image.nonMaxSuppression(
@@ -1469,7 +1475,10 @@ const detectHands = async (model, scaledWidth, scaledHeight) => {
     });
     scores.dispose();
     tboxes.dispose();
-    return handsDetected;
+    console.log(handsDetected);
+    if (handDetectionRunning) {
+        window.requestAnimationFrame(detectHands);
+    }
 };
 
 // https://aaronsmith.online/easily-load-an-external-script-using-javascript/
@@ -1507,6 +1516,8 @@ const loadHandDetectionModel = () => {
             console.log("video started");
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
+            handDetectionRunning = true;
+            window.requestAnimationFrame(detectHands);
         }).catch(err => {
             console.log("error loading hand detection model");
             console.log(err);
@@ -1515,6 +1526,7 @@ const loadHandDetectionModel = () => {
 }
 
 const unloadHandDetectionModel = () => {
+    handDetectionRunning = false;
     video.pause();
     const tracks = video.srcObject.getTracks();
     for (var i = 0; i < tracks.length; i++) {
