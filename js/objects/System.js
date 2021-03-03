@@ -43,6 +43,7 @@ const ctx = canvas.getContext('2d');
 
 var handDetectionModel = null;
 var handDetectionRunning = false;
+var leninHand = null;
 
 const System = {
     name: "System",
@@ -1531,6 +1532,12 @@ const loadHandDetectionModel = () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             handDetectionRunning = true;
+            const msg = {
+                type: 'command',
+                commandName: 'newModel',
+                args: ['image', undefined, "/images/leninHand.png"]
+            }
+            leninHand = System.sendMessage(msg, System, System)
             window.requestAnimationFrame(detectHands);
         }).catch(err => {
             console.log("error loading hand detection model");
@@ -1541,6 +1548,8 @@ const loadHandDetectionModel = () => {
 
 const unloadHandDetectionModel = () => {
     handDetectionRunning = false;
+    System.deleteModel(leninHand.id)
+    leninHand = null;
     video.pause();
     const tracks = video.srcObject.getTracks();
     for (var i = 0; i < tracks.length; i++) {
