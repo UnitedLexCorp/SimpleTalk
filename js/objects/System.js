@@ -968,8 +968,9 @@ System._commandHandlers['deleteModel'] = function(senders, ...rest){
 };
 //System._commandHandlers['newModel'] = System.newModel;
 System._commandHandlers['newModel'] = function(senders, ...rest){
-    System.newModel(...rest);
+    const model = System.newModel(...rest);
     this.serialize();
+    return model;
 };
 //System._commandHandlers['copyModel'] = System.copyModel;
 System._commandHandlers['copyModel'] = function(senders, ...rest){
