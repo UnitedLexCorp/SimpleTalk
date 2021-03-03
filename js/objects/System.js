@@ -1486,8 +1486,14 @@ const detectHands = async () => {
     const box = handsDetected.boxes[0].box;
     const [x1, y1] = box.upperLeft;
     const [x2, y2] = box.lowerRight;
+    const [x, y] = [0.5 * (x1 + x2), 0.5 * (y1 + y2)];
     const area = {area: (x2 - x1) * (y2 - y1), timestamp: Date.now()};
     handDetectionAreas = [].concat(handDetectionAreas.slice(-59), [area]);
+    // Get viewport size
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
+    leninHand.partProperties.setPropertyNamed(leninHand, "left", x * vw);
+    leninHand.partProperties.setPropertyNamed(leninHand, "top", y * vh);
     if (handDetectionRunning) {
         window.requestAnimationFrame(detectHands);
     }
@@ -1531,6 +1537,7 @@ const loadHandDetectionModel = () => {
             console.log("video started");
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
+            ctx.setTransform(-1, 0, 0, 1, canvas.width, 0); // Mirror incoming video
             handDetectionRunning = true;
             const msg = {
                 type: 'command',
