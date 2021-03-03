@@ -1475,11 +1475,23 @@ const detectHands = async () => {
     });
     scores.dispose();
     tboxes.dispose();
-    console.log(handsDetected);
+    if (handsDetected.boxes.length !== 1) {
+        if (handDetectionRunning) {
+            window.requestAnimationFrame(detectHands);
+        }
+        return;
+    }
+    const box = handsDetected.boxes[0].box;
+    const [x1, y1] = box.upperLeft;
+    const [x2, y2] = box.lowerRight;
+    const area = {area: (x2 - x1) * (y2 - y1), timestamp: Date.now()};
+    handDetectionAreas = [].concat(handDetectionAreas.slice(-59), [area]);
     if (handDetectionRunning) {
         window.requestAnimationFrame(detectHands);
     }
 };
+
+var handDetectionAreas = [];
 
 // https://aaronsmith.online/easily-load-an-external-script-using-javascript/
 const loadScript = src => {
@@ -1500,6 +1512,7 @@ const loadScript = src => {
 };
 
 const loadHandDetectionModel = () => {
+    handDetectionAreas = [];
     loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.5/dist/tf.js").then(() => {
         window.tf.loadFrozenModel(
             "https://cdn.jsdelivr.net/npm/handtrackjs/models/web/ssdlitemobilenetv2/tensorflowjs_model.pb",
@@ -1548,6 +1561,7 @@ System._commandHandlers['toggleHandDetection'] = () => {
 
 System.getVideo = () => { return video; }
 System.getCanvas = () => { return canvas; }
+System.getAreas = () => { return handDetectionAreas; }
 
 /** Register the initial set of parts in the system **/
 System.registerPart('card', Card);
