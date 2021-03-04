@@ -1601,6 +1601,77 @@ System.getVideo = () => { return video; }
 System.getCanvas = () => { return canvas; }
 System.getAreas = () => { return handDetectionAreas; }
 
+const getVertices = (element) => {
+    const rect = element.getBoundingClientRect();
+    const upperLeft = [rect.x, rect.y];
+    const upperRight = [rect.x + rect.width, rect.y];
+    const lowerLeft = [rect.x, rect.y + rect.height];
+    const lowerRight = [rect.x + rect.width, rect.y + rect.height];
+    return {
+        upperLeft: upperLeft,
+        upperRight: upperRight,
+        lowerLeft: lowerLeft,
+        lowerRight: lowerRight
+    };
+}
+
+const dist = (point, element) => {
+    const vertices = getVertices(element);
+    const [p1, p2] = point;
+    const [ul1, ul2] = vertices.upperLeft;
+    const [ll1, ll2] = vertices.lowerLeft;
+    const [ur1, ur2] = vertices.upperRight;
+    const [lr1, lr2] = vertices.lowerRight;
+    // First check if the point is inside the rectangle
+    // Next we compute the vector pointing from the point to the closest point
+    // on the rectangle. There are 9 cases. The first is when the poinst is
+    // inside the rectangle. The next four cases are if the point in one of
+    // the four corners and the final four cases are when the point is on one
+    // of the four sides.
+    var [v1, v2] = [null, null];
+    if ((ul1 <= p1) && (p1 <= lr1) && (ul2 <= p2) && (p2 <= lr2)) {
+        // Case 0: inside the rectangle
+        console.log("inside rectangle");
+        [v1, v2] = [0, 0];
+    } else if ((p1 <= ul1) && (p2 <= ul2)) {
+        // Case 1: upper left
+        console.log("upper left");
+        [v1, v2] = [ul1 - p1, ul2 - p2];
+    } else if ((p1 >= ur1) && (p2 <= ur2)) {
+        // Case 2: upper right
+        console.log("upper right");
+        [v1, v2] = [ur1 - p1, ur2 - p2];
+    } else if ((p1 <= ll1) && (p2 >= ll2)) {
+        // Case 3: lower left
+        console.log("lower left");
+        [v1, v2] = [ll1 - p1, ll2 - p2];
+    } else if ((p1 >= lr1) && (p2 >= lr2)) {
+        // Case 4: lower right
+        console.log("lower right");
+        [v1, v2] = [lr1 - p1, lr2 - p2];
+    } else if (p1 <= ul1) {
+        // Case 5: side left
+        console.log("side left");
+        [v1, v2] = [ul1 - p1, 0];
+    } else if (p1 >= lr1) {
+        // Case 6: side right
+        console.log("side right");
+        [v1, v2] = [lr1 - p1, 0];
+    } else if (p2 <= ul2) {
+        // Case 7: side top
+        console.log("side top");
+        [v1, v2] = [0, ul2 - p2];
+    } else if (p2 >= lr2) {
+        // Case 8: side bottom
+        console.log("side bottom");
+        [v1, v2] = [0, lr2 - p2];
+    } else {
+        console.log("error should never get here!!!");
+    }
+    console.log("vector:", [v1, v2]);
+    return Math.sqrt(v1*v1 + v2*v2);
+}
+
 /** Register the initial set of parts in the system **/
 System.registerPart('card', Card);
 System.registerPart('stack', Stack);
