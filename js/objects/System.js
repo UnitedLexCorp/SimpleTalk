@@ -44,6 +44,10 @@ const ctx = canvas.getContext('2d');
 var handDetectionModel = null;
 var handDetectionRunning = false;
 var leninHand = null;
+var handMasked = false;
+
+// XXX - Only here to ignore the tensorflow warnings
+console.warn = () => {};
 
 const System = {
     name: "System",
@@ -1488,12 +1492,29 @@ const detectHands = async () => {
     const [x2, y2] = box.lowerRight;
     const [x, y] = [0.5 * (x1 + x2), 0.5 * (y1 + y2)];
     const area = {area: (x2 - x1) * (y2 - y1), timestamp: Date.now()};
-    handDetectionAreas = [].concat(handDetectionAreas.slice(-59), [area]);
-    // Get viewport size
+    handDetectionAreas = [].concat(handDetectionAreas.slice(-2), [area]);
+    // Update hand location
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
     leninHand.partProperties.setPropertyNamed(leninHand, "left", x * vw);
     leninHand.partProperties.setPropertyNamed(leninHand, "top", y * vh);
+    // Extract area information without any timestamps
+    var justAreas = [];
+    for (var i = 0; i < handDetectionAreas.length; ++i) {
+        justAreas.push(handDetectionAreas[i].area);
+    }
+    var justAreas = [].concat(Array(3 - justAreas.length).fill(0), justAreas);
+    // Check if hand is pushing in
+    const [a1, a2, a3] = justAreas;
+    const aveArea = (1/3) * (a1 + a2 + a3);
+    if (aveArea > 0.25) {
+        console.log("hand pushed in");
+        if (!handMasked) {
+            handMasked = true;
+            setTimeout(() => { handMasked = false; }, 3000);
+            console.log("hand registered!");
+        }
+    }
     if (handDetectionRunning) {
         window.requestAnimationFrame(detectHands);
     }
