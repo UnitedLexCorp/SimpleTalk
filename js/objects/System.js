@@ -1490,14 +1490,14 @@ const detectHands = async () => {
     const box = handsDetected.boxes[0].box;
     const [x1, y1] = box.upperLeft;
     const [x2, y2] = box.lowerRight;
-    const [x, y] = [0.5 * (x1 + x2), 0.5 * (y1 + y2)];
     const area = {area: (x2 - x1) * (y2 - y1), timestamp: Date.now()};
     handDetectionAreas = [].concat(handDetectionAreas.slice(-2), [area]);
     // Update hand location
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
-    leninHand.partProperties.setPropertyNamed(leninHand, "left", x * vw);
-    leninHand.partProperties.setPropertyNamed(leninHand, "top", y * vh);
+    const [p1, p2] = [0.5 * (x1 + x2) * vw, 0.5 * (y1 + y2) * vh];
+    leninHand.partProperties.setPropertyNamed(leninHand, "left", p1);
+    leninHand.partProperties.setPropertyNamed(leninHand, "top", p2);
     // Extract area information without any timestamps
     var justAreas = [];
     for (var i = 0; i < handDetectionAreas.length; ++i) {
@@ -1508,17 +1508,31 @@ const detectHands = async () => {
     const [a1, a2, a3] = justAreas;
     const aveArea = (1/3) * (a1 + a2 + a3);
     if (aveArea > 0.25) {
-        console.log("hand pushed in");
+        //console.log("hand pushed in");
         if (!handMasked) {
             handMasked = true;
             setTimeout(() => { handMasked = false; }, 3000);
-            console.log("hand registered!");
+            //console.log("hand registered!");
+            findClosestView([p1, p2]);
         }
     }
     if (handDetectionRunning) {
         window.requestAnimationFrame(detectHands);
     }
 };
+
+const findClosestView = (point) => {
+    let views = [];
+    System.getCurrentCardModel().subparts.forEach((part) => {
+        let partViews = System.findViewsById(part.id);
+        partViews.forEach((view) => {
+            views.push(view);
+        })
+    });
+    views.forEach((view) => {
+        console.log(view.textContent, dist(point, view));
+    });
+}
 
 var handDetectionAreas = [];
 
@@ -1631,44 +1645,44 @@ const dist = (point, element) => {
     var [v1, v2] = [null, null];
     if ((ul1 <= p1) && (p1 <= lr1) && (ul2 <= p2) && (p2 <= lr2)) {
         // Case 0: inside the rectangle
-        console.log("inside rectangle");
+        //console.log("inside rectangle");
         [v1, v2] = [0, 0];
     } else if ((p1 <= ul1) && (p2 <= ul2)) {
         // Case 1: upper left
-        console.log("upper left");
+        //console.log("upper left");
         [v1, v2] = [ul1 - p1, ul2 - p2];
     } else if ((p1 >= ur1) && (p2 <= ur2)) {
         // Case 2: upper right
-        console.log("upper right");
+        //console.log("upper right");
         [v1, v2] = [ur1 - p1, ur2 - p2];
     } else if ((p1 <= ll1) && (p2 >= ll2)) {
         // Case 3: lower left
-        console.log("lower left");
+        //console.log("lower left");
         [v1, v2] = [ll1 - p1, ll2 - p2];
     } else if ((p1 >= lr1) && (p2 >= lr2)) {
         // Case 4: lower right
-        console.log("lower right");
+        //console.log("lower right");
         [v1, v2] = [lr1 - p1, lr2 - p2];
     } else if (p1 <= ul1) {
         // Case 5: side left
-        console.log("side left");
+        //console.log("side left");
         [v1, v2] = [ul1 - p1, 0];
     } else if (p1 >= lr1) {
         // Case 6: side right
-        console.log("side right");
+        //console.log("side right");
         [v1, v2] = [lr1 - p1, 0];
     } else if (p2 <= ul2) {
         // Case 7: side top
-        console.log("side top");
+        //console.log("side top");
         [v1, v2] = [0, ul2 - p2];
     } else if (p2 >= lr2) {
         // Case 8: side bottom
-        console.log("side bottom");
+        //console.log("side bottom");
         [v1, v2] = [0, lr2 - p2];
     } else {
-        console.log("error should never get here!!!");
+        //console.log("error should never get here!!!");
     }
-    console.log("vector:", [v1, v2]);
+    //console.log("vector:", [v1, v2]);
     return Math.sqrt(v1*v1 + v2*v2);
 }
 
