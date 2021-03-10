@@ -45,6 +45,7 @@ var handDetectionModel = null;
 var handDetectionRunning = false;
 var leninHand = null;
 var handMasked = false;
+var targetElement = null;
 
 // XXX - Only here to ignore the tensorflow warnings
 console.warn = () => {};
@@ -1496,8 +1497,12 @@ const detectHands = async () => {
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
     const [p1, p2] = [0.5 * (x1 + x2) * vw, 0.5 * (y1 + y2) * vh];
-    leninHand.partProperties.setPropertyNamed(leninHand, "left", p1);
-    leninHand.partProperties.setPropertyNamed(leninHand, "top", p2);
+    var target = targetElement;
+    if (target === null) {
+        target = leninHand;
+    }
+    target.partProperties.setPropertyNamed(target, "left", p1);
+    target.partProperties.setPropertyNamed(target, "top", p2);
     // Extract area information without any timestamps
     var justAreas = [];
     for (var i = 0; i < handDetectionAreas.length; ++i) {
@@ -1512,8 +1517,16 @@ const detectHands = async () => {
         if (!handMasked) {
             handMasked = true;
             setTimeout(() => { handMasked = false; }, 3000);
-            //console.log("hand registered!");
-            findClosestView([p1, p2]);
+            if (targetElement === null) {
+                let closestView = findClosestView([p1, p2]);
+                if (closestView !== null) {
+                    leninHand.partProperties.setPropertyNamed(leninHand, "hide", true);
+                    targetElement = closestView.model;
+                }
+            } else {
+                leninHand.partProperties.setPropertyNamed(leninHand, "hide", false);
+                targetElement = null;
+            }
         }
     }
     if (handDetectionRunning) {
@@ -1524,14 +1537,23 @@ const detectHands = async () => {
 const findClosestView = (point) => {
     let views = [];
     System.getCurrentCardModel().subparts.forEach((part) => {
+        if (part.id === leninHand.id) {
+            return;
+        }
         let partViews = System.findViewsById(part.id);
         partViews.forEach((view) => {
             views.push(view);
         })
     });
+    var [closestDist, closestView] = [Infinity, null];
     views.forEach((view) => {
-        console.log(view.textContent, dist(point, view));
+        let viewDist = dist(point, view);
+        if (viewDist < closestDist) {
+            closestDist = viewDist;
+            closestView = view;
+        }
     });
+    return closestView;
 }
 
 var handDetectionAreas = [];
@@ -1580,6 +1602,7 @@ const loadHandDetectionModel = () => {
                 args: ['image', undefined, "/images/leninHand.png"]
             }
             leninHand = System.sendMessage(msg, System, System)
+            targetElement = null;
             window.requestAnimationFrame(detectHands);
         }).catch(err => {
             console.log("error loading hand detection model");
@@ -1614,6 +1637,7 @@ System._commandHandlers['toggleHandDetection'] = () => {
 System.getVideo = () => { return video; }
 System.getCanvas = () => { return canvas; }
 System.getAreas = () => { return handDetectionAreas; }
+System.getHand = () => { return leninHand; }
 
 const getVertices = (element) => {
     const rect = element.getBoundingClientRect();
