@@ -15,7 +15,7 @@ import Container from './parts/Container.js';
 import Drawing from './parts/Drawing.js';
 import Image from './parts/Image.js';
 
-import ButtonEditor from './parts/editors/ButtonEditor.js';
+// import ButtonEditor from './parts/editors/ButtonEditor.js';
 
 import WorldView from './views/WorldView.js';
 import StackView from './views/StackView.js';
@@ -30,6 +30,7 @@ import ImageView from './views/ImageView.js';
 
 import Halo from './views/Halo.js';
 import ButtonEditorView from './views/editors/ButtonEditorView.js';
+import FieldEditorView from './views/editors/FieldEditorView.js';
 
 import ohm from 'ohm-js';
 import interpreterSemantics from '../ohm/interpreter-semantics.js';
@@ -943,9 +944,13 @@ const System = {
         let currentCardView = this.findViewById(currentCard.id);
         if(partType === 'button'){
             // Create the new view instance,
-            // append to parent, and set the target 
+            // append to parent, and set the target
             editor = document.createElement(
                 "st-button-editor"
+            );
+        } else if(partType === 'field'){
+            editor = document.createElement(
+                "st-field-editor"
             );
         }
         currentCardView.appendChild(editor);
@@ -1629,6 +1634,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // like the halo
     window.customElements.define('st-halo', Halo);
     window.customElements.define('st-button-editor', ButtonEditorView);
+    window.customElements.define('st-field-editor', FieldEditorView);
 
     // Perform the initial setup of
     // the system

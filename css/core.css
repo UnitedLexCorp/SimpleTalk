@@ -210,3 +210,7 @@ st-button-editor:active {
     animation: marching-ants-animation 400ms infinite linear;
     border-color: transparent;
 }
+
+.editable {
+    border: solid 1px var(--palette-orange);
+}
