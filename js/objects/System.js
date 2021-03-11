@@ -974,9 +974,8 @@ System._commandHandlers['deleteModel'] = function(senders, ...rest){
 };
 //System._commandHandlers['newModel'] = System.newModel;
 System._commandHandlers['newModel'] = function(senders, ...rest){
-    const model = System.newModel(...rest);
+    System.newModel(...rest);
     this.serialize();
-    return model;
 };
 //System._commandHandlers['copyModel'] = System.copyModel;
 System._commandHandlers['copyModel'] = function(senders, ...rest){
@@ -1596,12 +1595,7 @@ const loadHandDetectionModel = () => {
             canvas.height = video.videoHeight;
             ctx.setTransform(-1, 0, 0, 1, canvas.width, 0); // Mirror incoming video
             handDetectionRunning = true;
-            const msg = {
-                type: 'command',
-                commandName: 'newModel',
-                args: ['image', undefined, "/images/leninHand.png"]
-            }
-            leninHand = System.sendMessage(msg, System, System)
+            leninHand = System.newModel('image', undefined, "/images/leninHand.png");
             targetElement = null;
             window.requestAnimationFrame(detectHands);
         }).catch(err => {
