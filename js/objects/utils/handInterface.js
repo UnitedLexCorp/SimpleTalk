@@ -109,7 +109,7 @@ const findClosestView = (point) => {
     });
     var [closestDist, closestView] = [Infinity, null];
     views.forEach((view) => {
-        let viewDist = dist(point, view);
+        let viewDist = dist(point, getVertices(view));
         if (viewDist < closestDist) {
             closestDist = viewDist;
             closestView = view;
@@ -195,8 +195,7 @@ const getVertices = (element) => {
     };
 }
 
-const dist = (point, element) => {
-    const vertices = getVertices(element);
+const dist = (point, vertices) => {
     const [p1, p2] = point;
     const [ul1, ul2] = vertices.upperLeft;
     const [ll1, ll2] = vertices.lowerLeft;
@@ -273,9 +272,14 @@ class HandInterface {
     }
 }
 
+const Testables = {
+    dist: dist
+}
+
 const handInterface = new HandInterface();
 
 export {
+    Testables,
     handInterface,
     handInterface as default
 };
