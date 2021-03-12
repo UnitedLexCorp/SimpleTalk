@@ -41,14 +41,6 @@ const video = document.createElement('video');
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 
-var handDetectionModel = null;
-var handDetectionRunning = false;
-var leninHand = null;
-var handMasked = false;
-var targetElement = null;
-
-// XXX - Only here to ignore the tensorflow warnings
-console.warn = () => {};
 
 const System = {
     name: "System",
@@ -1439,6 +1431,7 @@ System._commandHandlers['tell'] = (senders, targetId, deferredMessage) => {
     targetPart.sendMessage(deferredMessage, targetPart);
 };
 
+// XXX - Internal
 const scaleDim = (dim) => {
     const scale = 0.7;
     const stride = 16;
@@ -1447,7 +1440,7 @@ const scaleDim = (dim) => {
 };
 
 const detectHands = async () => {
-    if (!handDetectionRunning) {
+    if (!handInterface.handDetectionRunning) {
         return;
     }
     const scaledWidth = scaleDim(canvas.width);
@@ -1456,7 +1449,7 @@ const detectHands = async () => {
     const image = tf.tidy(() => {
         return tf.fromPixels(canvas).resizeBilinear([scaledHeight, scaledWidth]).expandDims(0);
     });
-    const [scores, tboxes] = await handDetectionModel.executeAsync(image);
+    const [scores, tboxes] = await handInterface.handDetectionModel.executeAsync(image);
     image.dispose();
     const handsDetected = tf.tidy(() => {
         const indices = tf.image.nonMaxSuppression(
@@ -1482,7 +1475,7 @@ const detectHands = async () => {
     scores.dispose();
     tboxes.dispose();
     if (handsDetected.boxes.length !== 1) {
-        if (handDetectionRunning) {
+        if (handInterface.handDetectionRunning) {
             window.requestAnimationFrame(detectHands);
         }
         return;
@@ -1491,21 +1484,21 @@ const detectHands = async () => {
     const [x1, y1] = box.upperLeft;
     const [x2, y2] = box.lowerRight;
     const area = {area: (x2 - x1) * (y2 - y1), timestamp: Date.now()};
-    handDetectionAreas = [].concat(handDetectionAreas.slice(-2), [area]);
+    handInterface.handDetectionAreas = [].concat(handInterface.handDetectionAreas.slice(-2), [area]);
     // Update hand location
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
     const [p1, p2] = [0.5 * (x1 + x2) * vw, 0.5 * (y1 + y2) * vh];
-    var target = targetElement;
+    var target = handInterface.targetElement;
     if (target === null) {
-        target = leninHand;
+        target = handInterface.leninHand;
     }
     target.partProperties.setPropertyNamed(target, "left", p1);
     target.partProperties.setPropertyNamed(target, "top", p2);
     // Extract area information without any timestamps
     var justAreas = [];
-    for (var i = 0; i < handDetectionAreas.length; ++i) {
-        justAreas.push(handDetectionAreas[i].area);
+    for (var i = 0; i < handInterface.handDetectionAreas.length; ++i) {
+        justAreas.push(handInterface.handDetectionAreas[i].area);
     }
     var justAreas = [].concat(Array(3 - justAreas.length).fill(0), justAreas);
     // Check if hand is pushing in
@@ -1513,22 +1506,22 @@ const detectHands = async () => {
     const aveArea = (1/3) * (a1 + a2 + a3);
     if (aveArea > 0.25) {
         //console.log("hand pushed in");
-        if (!handMasked) {
-            handMasked = true;
-            setTimeout(() => { handMasked = false; }, 3000);
-            if (targetElement === null) {
+        if (!handInterface.handMasked) {
+            handInterface.handMasked = true;
+            setTimeout(() => { handInterface.handMasked = false; }, 3000);
+            if (handInterface.targetElement === null) {
                 let closestView = findClosestView([p1, p2]);
                 if (closestView !== null) {
-                    leninHand.partProperties.setPropertyNamed(leninHand, "hide", true);
-                    targetElement = closestView.model;
+                    handInterface.leninHand.partProperties.setPropertyNamed(handInterface.leninHand, "hide", true);
+                    handInterface.targetElement = closestView.model;
                 }
             } else {
-                leninHand.partProperties.setPropertyNamed(leninHand, "hide", false);
-                targetElement = null;
+                handInterface.leninHand.partProperties.setPropertyNamed(handInterface.leninHand, "hide", false);
+                handInterface.targetElement = null;
             }
         }
     }
-    if (handDetectionRunning) {
+    if (handInterface.handDetectionRunning) {
         window.requestAnimationFrame(detectHands);
     }
 };
@@ -1536,7 +1529,7 @@ const detectHands = async () => {
 const findClosestView = (point) => {
     let views = [];
     System.getCurrentCardModel().subparts.forEach((part) => {
-        if (part.id === leninHand.id) {
+        if (part.id === handInterface.leninHand.id) {
             return;
         }
         let partViews = System.findViewsById(part.id);
@@ -1554,8 +1547,6 @@ const findClosestView = (point) => {
     });
     return closestView;
 }
-
-var handDetectionAreas = [];
 
 // https://aaronsmith.online/easily-load-an-external-script-using-javascript/
 const loadScript = src => {
@@ -1576,14 +1567,14 @@ const loadScript = src => {
 };
 
 const loadHandDetectionModel = () => {
-    handDetectionAreas = [];
+    handInterface.handDetectionAreas = [];
     loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.5/dist/tf.js").then(() => {
         window.tf.loadFrozenModel(
             "https://cdn.jsdelivr.net/npm/handtrackjs/models/web/ssdlitemobilenetv2/tensorflowjs_model.pb",
             "https://cdn.jsdelivr.net/npm/handtrackjs/models/web/ssdlitemobilenetv2/weights_manifest.json"
         ).then(model => {
             console.log("hand detection model loaded");
-            handDetectionModel = model;
+            handInterface.handDetectionModel = model;
         }).then(() => {
             return navigator.mediaDevices.getUserMedia({ video: true });
         }).then(stream => {
@@ -1594,9 +1585,9 @@ const loadHandDetectionModel = () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.setTransform(-1, 0, 0, 1, canvas.width, 0); // Mirror incoming video
-            handDetectionRunning = true;
-            leninHand = System.newModel('image', undefined, "/images/leninHand.png");
-            targetElement = null;
+            handInterface.handDetectionRunning = true;
+            handInterface.leninHand = System.newModel('image', undefined, "/images/leninHand.png");
+            handInterface.targetElement = null;
             window.requestAnimationFrame(detectHands);
         }).catch(err => {
             console.log("error loading hand detection model");
@@ -1606,9 +1597,9 @@ const loadHandDetectionModel = () => {
 }
 
 const unloadHandDetectionModel = () => {
-    handDetectionRunning = false;
-    System.deleteModel(leninHand.id)
-    leninHand = null;
+    handInterface.handDetectionRunning = false;
+    System.deleteModel(handInterface.leninHand.id)
+    handInterface.leninHand = null;
     video.pause();
     const tracks = video.srcObject.getTracks();
     for (var i = 0; i < tracks.length; i++) {
@@ -1616,22 +1607,40 @@ const unloadHandDetectionModel = () => {
     }
     video.srcObject = null;
     console.log("video stopped");
-    handDetectionModel = null;
+    handInterface.handDetectionModel = null;
     console.log("unloading hand detection model");
 }
 
-System._commandHandlers['toggleHandDetection'] = () => {
-    if (handDetectionModel === null) {
+class HandInterface {
+    constructor() {
+        this.handDetectionModel = null;
+        this.handDetectionRunning = false;
+        this.leninHand = null;
+        this.handMasked = false;
+        this.targetElement = null;
+        this.handDetectionAreas = [];
+        // XXX - Only here to ignore the tensorflow warnings
+        console.warn = () => {};
+    }
+
+    start() {
         loadHandDetectionModel();
-    } else {
+    }
+
+    stop() {
         unloadHandDetectionModel();
     }
-};
+}
 
-System.getVideo = () => { return video; }
-System.getCanvas = () => { return canvas; }
-System.getAreas = () => { return handDetectionAreas; }
-System.getHand = () => { return leninHand; }
+const handInterface = new HandInterface();
+
+System._commandHandlers['toggleHandDetection'] = () => {
+    if (handInterface.handDetectionModel === null) {
+        handInterface.start();
+    } else {
+        handInterface.stop();
+    }
+};
 
 const getVertices = (element) => {
     const rect = element.getBoundingClientRect();
