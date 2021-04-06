@@ -1,6 +1,6 @@
 /**
  * Testing the implementation of the
- * primitive 'is there a' command in the interpreter
+ * primitive 'there is a' command in the interpreter
  */
 import chai from 'chai';
 import ohm from 'ohm-js';
@@ -19,7 +19,7 @@ function getSemanticsFor(aPart){
     return semantics;
 }
 
-describe('"is there a" command tests', () => {
+describe('"there is (not) (a|an)" command tests', () => {
     let semantics;
     let currentCard;
     let exampleArea;
@@ -32,27 +32,33 @@ describe('"is there a" command tests', () => {
             expect(initSemantics).to.not.throw();
         });
         it('Current card', () => {
-            let script = `is there a current card`;
+            let script = `there is a current card`;
             let match = testLanguageGrammar.match(script, 'Conditional');
             assert.isTrue(match.succeeded());
             assert.isTrue(semantics(match).interpret());
         });
         it('Non-existent button', () => {
-            let script = `is there a button "I exist"`;
+            let script = `there is a button "I exist"`;
             let match = testLanguageGrammar.match(script, 'Conditional');
             assert.isTrue(match.succeeded());
             assert.isFalse(semantics(match).interpret());
+        });
+        it('Non-existent button', () => {
+            let script = `there is not a button "I exist"`;
+            let match = testLanguageGrammar.match(script, 'Conditional');
+            assert.isTrue(match.succeeded());
+            assert.isTrue(semantics(match).interpret());
         });
         it('Can add a button to the current card and then it will exist', () => {
             let addScript = `add button "I exist" to current card`;
             let addMatch = testLanguageGrammar.match(addScript, 'Command');
             let msg = semantics(addMatch).interpret();
             currentCard.sendMessage(msg, currentCard);
-            let script = `is there a button "I exist" of current card`;
+            let script = `there is a button "I exist" of current card`;
             let match = testLanguageGrammar.match(script, 'Conditional');
             assert.isTrue(match.succeeded());
             assert.isTrue(semantics(match).interpret());
-            script = `is there a button "I exist"`;
+            script = `there is a button "I exist"`;
             match = testLanguageGrammar.match(script, 'Conditional');
             assert.isTrue(match.succeeded());
             assert.isTrue(semantics(match).interpret());
