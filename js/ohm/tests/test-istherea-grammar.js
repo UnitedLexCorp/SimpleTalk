@@ -32,65 +32,57 @@ describe("'is there a' ObjectSpecifier" , () => {
     it ("Basic (current card)", () => {
         objects.forEach((d) => {
             const s = `is there a current card`;
-            semanticMatchTest(s, "Command");
-            semanticMatchTest(s, "Command_isThereAnObject");
-            semanticMatchTest(s, "Statement");
+            semanticMatchTest(s, "Conditional");
+            semanticMatchTest(s, "IsThereAnObjectConditional");
         });
     });
     it ("Basic (wth id)", () => {
         objects.forEach((d) => {
             const s = `is there a card 20`;
-            semanticMatchTest(s, "Command");
-            semanticMatchTest(s, "Command_isThereAnObject");
-            semanticMatchTest(s, "Statement");
+            semanticMatchTest(s, "Conditional");
+            semanticMatchTest(s, "IsThereAnObjectConditional");
         });
     });
     it ("By name of current stack", () => {
         objects.forEach((d) => {
             const s = `is there a card "NewCard" of current stack`;
-            semanticMatchTest(s, "Command");
-            semanticMatchTest(s, "Command_isThereAnObject");
-            semanticMatchTest(s, "Statement");
+            semanticMatchTest(s, "Conditional");
+            semanticMatchTest(s, "IsThereAnObjectConditional");
         });
     });
     it ("Basic (with name, wth id)", () => {
         objects.forEach((d) => {
             const s = `is there a ${d} "newPart 123" of card 20`;
-            semanticMatchTest(s, "Command");
-            semanticMatchTest(s, "Command_isThereAnObject");
-            semanticMatchTest(s, "Statement");
+            semanticMatchTest(s, "Conditional");
+            semanticMatchTest(s, "IsThereAnObjectConditional");
         });
     });
     it ("'Of this'", () => {
         objects.forEach((d) => {
             const s = `is there a  ${d} "newPart 123" of this stack`;
-            semanticMatchTest(s, "Command");
-            semanticMatchTest(s, "Command_isThereAnObject");
-            semanticMatchTest(s, "Statement");
+            semanticMatchTest(s, "Conditional");
+            semanticMatchTest(s, "IsThereAnObjectConditional");
         });
     });
     it ("Named of 'current'", () => {
         objects.forEach((d) => {
             const s = `is there a ${d} "newPart123" of current stack`;
-            semanticMatchTest(s, "Command");
-            semanticMatchTest(s, "Command_isThereAnObject");
-            semanticMatchTest(s, "Statement");
+            semanticMatchTest(s, "Conditional");
+            semanticMatchTest(s, "IsThereAnObjectConditional");
         });
     });
     it("no target or context (should fail)", () => {
         objects.forEach((d) => {
             const s = `is there a ${d}`;
-            semanticMatchFailTest(s, "Command");
-            semanticMatchFailTest(s, "Command_isThereAnObject");
-            semanticMatchFailTest(s, "Statement");
+            semanticMatchFailTest(s, "Conditional");
+            semanticMatchFailTest(s, "IsThereAnObjectConditional");
         });
     });
     it("Named without context", () => {
         objects.forEach((d) => {
             const s = `is there a ${d} "newPart123"`;
-            semanticMatchTest(s, "Command");
-            semanticMatchTest(s, "Command_isThereAnObject");
-            semanticMatchTest(s, "Statement");
+            semanticMatchTest(s, "Conditional");
+            semanticMatchTest(s, "IsThereAnObjectConditional");
         });
     });
 });
