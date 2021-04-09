@@ -8,7 +8,6 @@ import cssStyler from '../utils//styler.js';
  * I also include some convenience methods
  * on my prototype that should be used by
  * other Parts when they inherit from me.
- * For now, we use Object.create() for inheritance.
  */
 
 class BasicProperty {

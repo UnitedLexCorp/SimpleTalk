@@ -13,7 +13,7 @@ const sides = ["top", "bottom", "left", "right"];
 const addBasicStyleProps = (target) => {
     target.partProperties.newStyleProp(
         'background-transparency',
-        1,
+        "default",
     );
     target.partProperties.newStyleProp(
         'background-color',
@@ -21,7 +21,7 @@ const addBasicStyleProps = (target) => {
     );
     target.partProperties.newStyleProp(
         'transparency',
-        1.0,
+        1,
     );
     sides.forEach((s) => {
         target.partProperties.newStyleProp(
