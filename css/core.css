@@ -25,6 +25,25 @@
     --drawing-default-height: 300px;
     --field-default-width: 300px;
     --field-default-height: 200px;
+
+    /* Window Specific */
+    --skin-win-bar-min-height: 25px;
+    --skin-win-bar-background-rgb: 218, 218, 218;
+    --skin-win-bar-background-opacity: 1.0;
+    --skin-win-bar-padding-left: 8px;
+    --skin-win-bar-padding-right: 8px;
+    --skin-win-bar-padding-top: 3px;
+    --skin-win-bar-padding-bottom: 3px;
+    --skin-win-bar-button-width: 12px;
+    --skin-win-bar-button-height: 12px;
+    --skin-win-bar-button-border-radius: 100%;
+    --skin-win-bar-button-background-color: rgba(255, 150, 150);
+    --skin-win-bar-button-margin-right: 4px;
+    --skin-win-bar-button-margin-left: 4px;
+    --skin-win-pane-border-rgb: 0, 0, 0;
+    --skin-win-pane-border-alpha: 1.0;
+    --skin-win-pane-border-width: 1px;
+    --skin-win-pane-border-style: solid;
 }
 
 /* Keyframe Animations */
@@ -48,7 +67,7 @@ body {
 }
 
 .active {
-    outline: solid var(--palette-orange) 1px;
+    outline: solid rgb(var(--skin-secondary-color-rgb)) 1px;
 }
 
 /* =World Styles
@@ -107,8 +126,6 @@ st-button {
     padding-top: 5px;
     padding-bottom: 5px;
     user-select: none;
-    margin-left: -1px;
-    margin-right: -1px;
 }
 
 st-button:not(.editing):hover {

@@ -9,12 +9,38 @@
 /* =Variables
  *----------------------------------------------------*/
 st-stack {
+    /* Color Schemes */
+    --skin-primary-color-rgb: 83, 58, 113;
+    --skin-secondary-color-rgb: 97, 132, 216;
+    --skin-tertiary-color-rgb: 80, 197, 183;
+    --skin-alt1-color-rgb: 156, 236, 91;
+    --skin-alt2-color-rgb: 240, 244, 101;
+
+    /* General Font */
+    --skin-font-size: 14;
+    --skin-font-weight: 600;
+    --skin-font-family: sans-serif;
+    --skin-text-color-dark: black;
+    --skin-text-color-light: white;
+
+    /* Background */
     --skin-background-transparency: 0.0;
     --skin-background-opacity: calc(1.0 - var(--skin-background-transparency));
     --skin-background-color-rgb: 255, 255, 255;
     --skin-background-color: rgba(var(--skin-background-color-rgb), var(--skin-background-opacity));
+
+    /* Borders */
+    --skin-border-color-rgb: 0, 0, 0;
+    --skin-border-color-alpha: 0.0;
+    --skin-border-width: 0;
+    --skin-border-style: solid;
+    
+    /* Box Shadow */
     --skin-box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     --skin-hover-box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    --skin-active-box-shadow: 0 3px 6px rgba(0,0,0,0.23), 0 3px 10px rgba(0,0,0,0.30);
+
+    /* Button Specific */
     --skin-button-font-size: 14;
     --skin-button-font-weight: 600;
     --skin-button-padding-left: 16px;
@@ -24,15 +50,25 @@ st-stack {
 /* =Button Styles
  *-----------------------------------------------------*/
 st-button {
-    --skin-background-color-rgb: 120, 0, 120;
+    --skin-background-color-rgb: var(--skin-primary-color-rgb);
     --skin-background-transparency: 0.0;
     font-family: sans-serif;
     font-size: var(--skin-button-font-size);
     font-weight: var(--skin-button-font-weight);
     text-transform: uppercase;
     border-radius: 3px;
+    border-style: var(--skin-border-style);
     box-shadow: var(--skin-box-shadow);
-    color: white;
+    color: var(--skin-text-color-light);
+}
+
+st-button.variant-outline {
+    --skin-background-transparency: 1.0;
+    --skin-border-width: 1px;
+    --skin-border-color-alpha: 1.0;
+    --skin-border-color-rgb: var(--skin-primary-color-rgb);
+    color: rgb(var(--skin-primary-color-rgb));
+    border-color: rgba(var(--skin-border-color-rgb), var(--skin-border-color-alpha));
 }
 
 st-button:hover {
@@ -40,9 +76,34 @@ st-button:hover {
     transition: box-shadow 0.3s cubic-bezier(.25,.8,.25,1);
 }
 
+st-button:active:not(.editing) {
+    filter: brightness(110%);
+    box-shadow: var(--skin-active-box-shadow);
+}
+
+/* =Window Styles
+ *-----------------------------------------------------*/
+st-window {
+    --skin-win-bar-background-rgb: var(--skin-secondary-color-rgb);
+    --skin-win-bar-text-color: var(--skin-text-color-light);
+    --skin-win-bar-min-height: 30px;
+    --skin-win-bar-close-button-content: "\2A2F";
+    --skin-win-bar-button-height: auto;
+    --skin-win-bar-button-width: auto;
+    --skin-win-bar-button-background-color: transparent;
+    --skin-win-bar-button-border-radius: none;
+    --skin-win-pane-border-width: 1px;
+    box-shadow: var(--skin-box-shadow);
+}
+
+
+
 /* =All Part Styles
  *-----------------------------------------------------*/
 [part-id],
 [lens-part-id] {
     background-color: rgba(var(--skin-background-color-rgb), calc(1.0 - var(--skin-background-transparency)));
+    border-color: rgba(var(--skin-border-color-rgb), var(--skin-border-alpha));
+    border-width: var(--skin-border-width);
+    border-style: var(--skin-border-style);
 }

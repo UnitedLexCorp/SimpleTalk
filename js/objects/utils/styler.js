@@ -11,6 +11,14 @@ const cssStyler = (styleObj, propertyName, propertyValue) => {
             styleObj['--skin-background-transparency'] = propertyValue;
         }
         break;
+
+    case "box-shadow":
+        if(propertyValue == "default"){
+            styleObj['--skin-box-shadow'] = false;
+        } else {
+            styleObj['--skin-box-shadow'] = propertyValue;
+        }
+        break;
     case "top":
         _setOrNot(styleObj, "top",  _intToPx(propertyValue));
         break;
@@ -26,8 +34,12 @@ const cssStyler = (styleObj, propertyName, propertyValue) => {
     case "height":
         _setOrNot(styleObj, "height",  _intToPx(propertyValue));
         break;
-        
+
+    case "rotate":
+        _setOrNot(styleObj, "transform",  _intToRotateDeg(propertyValue));
+        break;
     }
+    
     return styleObj;
 };
 
@@ -50,6 +62,15 @@ const _intToPx = (n) => {
 const _setOrNot = (styleObj, name, value) => {
     if(value !== null && value !== undefined){
         styleObj[name] = value;
+    }
+};
+
+const _intToRotateDeg = (n) => {
+    if(n !== null && n !== undefined){
+        if(typeof(n) === "string"){
+            n = n.split("deg")[0];
+        }
+        return `rotate(${n}deg)`;
     }
 };
 
