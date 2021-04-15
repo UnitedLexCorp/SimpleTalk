@@ -93,10 +93,13 @@ st-window {
     --skin-win-bar-button-background-color: transparent;
     --skin-win-bar-button-border-radius: none;
     --skin-win-pane-border-width: 1px;
+    --skin-win-pane-border-rgb: 150, 150, 150;
+    --skin-win-pane-worder-alpha: 0.5;
     box-shadow: var(--skin-box-shadow);
 }
 
-
+/** TODO: Use :focus and tabindex to manage temporary appearance
+ ** of inactive vs active windows */
 
 /* =All Part Styles
  *-----------------------------------------------------*/

@@ -152,6 +152,7 @@ class WindowView extends PartView {
         this.setupClickAndDrag();
         this.setupBarButtons();
         this.setupExpanderAreas();
+        this.setAttribute('tabindex', "-1"); // So it can get focus
     }
 
     afterModelSet(){
