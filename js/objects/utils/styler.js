@@ -50,7 +50,35 @@ const cssStyler = (styleObj, propertyName, propertyValue) => {
     case "transparency":
         _setOrNot(styleObj, "opacity",  propertyValue);
         break;
+
+    case "left-margin":
+    case "right-margin":
+    case "top-margin":
+    case "bottom-margin":
+        var splitName = propertyName.split("-");
+        var cssName = splitName.reverse().join("-");
+        if(propertyValue == "default"){
+            styleObj[cssName] = false; // Unset
+        } else {
+            _setOrNot(styleObj, cssName, _intToPx(propertyValue));
+        }
+        break;
+
+    case "left-padding":
+    case "right-padding":
+    case "top-padding":
+    case "bottom-padding":
+        var splitName = propertyName.split("-");
+        var cssName = splitName.reverse().join("-");
+        if(propertyValue == "default"){
+            styleObj[cssName] = false; // Unset
+        } else {
+            _setOrNot(styleObj, cssName, _intToPx(propertyValue));
+        }
+        break;
     }
+
+    
     
     return styleObj;
 };
