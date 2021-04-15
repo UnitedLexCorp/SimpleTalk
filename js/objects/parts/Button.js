@@ -53,6 +53,12 @@ class Button extends Part {
         addTextStyleProps(this);
         this.setupStyleProperties();
 
+        // Additional styling for Buttons
+        this.partProperties.newBasicProp(
+            "style",
+            "default" // possibilities are default, primary, secondary?
+        );
+
         this.partProperties.setPropertyNamed(
             this,
             'corner-top-left-round',

@@ -32,6 +32,7 @@ class ButtonView extends PartView {
         this.onMouseEnter = this.onMouseEnter.bind(this);
         this.onClick = this.onClick.bind(this);
         this.setupPropHandlers = this.setupPropHandlers.bind(this);
+        this.updatePartStyle = this.updatePartStyle.bind(this);
 
         // Setup prop change handlers
         this.setupPropHandlers();
@@ -47,6 +48,7 @@ class ButtonView extends PartView {
         this.onPropChange('text-color', (value) =>{
             this.style.color = value;
         });
+        this.onPropChange('style', this.updatePartStyle);
     }
 
     afterConnected(){
@@ -69,6 +71,7 @@ class ButtonView extends PartView {
         if(buttonName){
             this.innerText = buttonName;
         };
+        this.updatePartStyle();
     }
 
     // We overwrite the PartView.onHaloOpenEditor for the moment
@@ -141,6 +144,18 @@ class ButtonView extends PartView {
             args: [],
             shouldIgnore: true
         }, this.model);
+    }
+
+    updatePartStyle(){
+        let partStyle = this.model.partProperties.getPropertyNamed(
+            this.model,
+            'style'
+        );
+        if(partStyle && partStyle != ""){
+            this.setAttribute("part-style", partStyle);
+        } else {
+            this.removeAttribute("part-style");
+        }
     }
 
     // Overwriting the base class open/close editor methods

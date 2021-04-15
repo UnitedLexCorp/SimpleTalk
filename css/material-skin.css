@@ -62,7 +62,7 @@ st-button {
     color: var(--skin-text-color-light);
 }
 
-st-button.variant-outline {
+st-button[part-style="secondary"] {
     --skin-background-transparency: 1.0;
     --skin-border-width: 1px;
     --skin-border-color-alpha: 1.0;
