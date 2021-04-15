@@ -51,7 +51,7 @@ class AreaView extends PartView {
 
         // Prop change handlers
         this.onPropChange('clipping', this.clippingChanged);
-        this.onPropChange('allow-scrolling', this.allowScrollingChanged)
+        this.onPropChange('allow-scrolling', this.allowScrollingChanged);
     }
 
     clippingChanged(newVal, id){

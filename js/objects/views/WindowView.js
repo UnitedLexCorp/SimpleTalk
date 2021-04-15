@@ -16,6 +16,13 @@ template.innerHTML = `
      box-sizing: border-box;
  }
 
+ .clip {
+     overflow: hidden;
+ }
+ .allow-scroll {
+     overflow: auto;
+ }
+
  .st-window-bar {
      display: flex;
      flex-direction: row;
@@ -142,10 +149,14 @@ class WindowView extends PartView {
 
         // Setup prop handlers
         this.setupPropHandlers();
+        this.clippingChanged = this.clippingChanged.bind(this);
+        this.allowScrollingChanged = this.allowScrollingChanged.bind(this);
     }
 
     setupPropHandlers(){
         this.onPropChange('title', this.setTitle);
+        this.onPropChange('clipping', this.clippingChanged);
+        this.onPropChange('allow-scrolling', this.allowScrollingChanged);
     }
 
     afterConnected(){
@@ -285,6 +296,26 @@ class WindowView extends PartView {
             '.st-window-title > span'
         );
         titleArea.innerText = aString;
+    }
+
+    clippingChanged(newVal, id){
+        let wrapper = this._shadowRoot.querySelector('.st-window-pane');
+        if(newVal == true){
+            wrapper.classList.remove('allow-scroll');
+            wrapper.classList.add('clip');
+        } else {
+            wrapper.classList.remove('clip');
+        }
+    }
+
+    allowScrollingChanged(newVal, id){
+        let wrapper = this._shadowRoot.querySelector('.st-window-pane');
+        if(newVal == true){
+            wrapper.classList.remove('clip');
+            wrapper.classList.add('allow-scroll');
+        } else {
+            wrapper.classList.remove('allow-scroll');
+        }
     }
 
 

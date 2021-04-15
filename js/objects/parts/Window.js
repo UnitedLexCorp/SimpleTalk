@@ -51,6 +51,17 @@ class Window extends Part {
             'isResizable',
             true
         );
+
+        // Clipping and scrolling
+        this.partProperties.newBasicProp(
+            'clipping',
+            false
+        );
+        this.partProperties.newBasicProp(
+            'allow-scrolling',
+            false
+        );
+        
         // Style
         addBasicStyleProps(this);
         addPositioningStyleProps(this);
