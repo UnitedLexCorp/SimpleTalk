@@ -52,7 +52,44 @@ class AreaView extends PartView {
         // Prop change handlers
         this.onPropChange('clipping', this.clippingChanged);
         this.onPropChange('allow-scrolling', this.allowScrollingChanged);
+
+        // Bound methods
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
     }
+
+    afterConnected(){
+        // Setup mouse event handling
+        this['onmousedown'] = this.onMouseDown;
+        this['onmouseup'] = this.onMouseUp;
+        this['onmouseenter'] = null;
+        this['onclick'] = null;
+    }
+
+    afterDisconnected(){
+        // Setup mouse event handling
+        this['onmousedown'] = null;
+        this['onmouseup'] = null;
+        this['onmouseenter'] = null;
+        this['onclick'] = null;
+    }
+
+    onMouseUp(event){
+        this.model.sendMessage({
+            type: 'command',
+            commandName: 'mouseUp',
+            args: []
+        }, this.model);
+    }
+
+    onMouseDown(event){
+        this.model.sendMessage({
+            type: 'command',
+            commandName: 'mouseDown',
+            args: []
+        }, this.model);
+    }
+    
 
     clippingChanged(newVal, id){
         let wrapper = this._shadowRoot.getElementById('area-wrapper');

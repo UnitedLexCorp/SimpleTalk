@@ -38,6 +38,18 @@ const cssStyler = (styleObj, propertyName, propertyValue) => {
     case "rotate":
         _setOrNot(styleObj, "transform",  _intToRotateDeg(propertyValue));
         break;
+
+    case "hide":
+        if(propertyValue === true){
+            styleObj["display"] = "none";
+        } else if(propertyValue === false){
+            styleObj["display"] = null;
+        }
+        break;
+
+    case "transparency":
+        _setOrNot(styleObj, "opacity",  propertyValue);
+        break;
     }
     
     return styleObj;
