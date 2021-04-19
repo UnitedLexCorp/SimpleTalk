@@ -42,9 +42,6 @@ class ButtonView extends PartView {
         this.onPropChange('name', (value, partId) => {
             this.innerText = value;
         });
-        this.onPropChange('background-color', (value) => {
-            this.style.backgroundColor = value;
-        });
         this.onPropChange('text-color', (value) =>{
             this.style.color = value;
         });
