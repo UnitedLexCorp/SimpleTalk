@@ -13,11 +13,11 @@ const sides = ["top", "bottom", "left", "right"];
 const addBasicStyleProps = (target) => {
     target.partProperties.newStyleProp(
         'background-transparency',
-        "default",
+        "default", // Skin default
     );
     target.partProperties.newStyleProp(
         'background-color',
-        "rgb(255, 255, 255)", // white 
+        "default" // skin default
     );
     target.partProperties.newStyleProp(
         'transparency',

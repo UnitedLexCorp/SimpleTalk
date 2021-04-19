@@ -226,7 +226,7 @@ class PartView extends HTMLElement {
         let cssStyle = this.model.partProperties.getPropertyNamed(this, "cssStyle");
         Object.keys(cssStyle).forEach((key) => {
             let value = cssStyle[key];
-            if(value == false){
+            if(value == null){
                 this.style.removeProperty(key);
                 console.log(this.style.getPropertyValue('--skin-background-transparency'));
             } else {
