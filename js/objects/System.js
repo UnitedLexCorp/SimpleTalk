@@ -47,7 +47,9 @@ import {STDeserializer, STSerializer} from './utils/serialization.js';
 
 const DOMparser = new DOMParser();
 
-
+/** Skin Testing **/
+console.warn('You have SKIN testing code in System! See imports section');
+import materialSkin from './utils/material-skin.js';
 
 const System = {
     name: "System",
@@ -1003,6 +1005,23 @@ System.grammar = languageGrammar;
 // System
 System.executionStack = new ExecutionStack();
 
+// Skin testing code
+console.warn('Skin testing code here too');
+System.updateSkinForPart = function(aPart, aSkin){
+    let props = aSkin[aPart.type];
+    if(!props){
+        return;
+    }
+    Object.keys(props.variants.default).forEach(propName => {
+        let propVal = props.variants.default[propName];
+        aPart.partProperties.setPropertyNamed(
+            aPart,
+            propName,
+            propVal
+        );
+    });
+};
+
 // Add a dynamic getter for the World for convenience
 Object.defineProperty(System, 'world', {
     get: function(){
@@ -1027,6 +1046,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     System.navigator = document.createElement('st-navigator');
     document.body.appendChild(System.navigator);
+
+    // Skin testing code
+    System.skins = {material: materialSkin};
 
     // Perform the initial setup of
     // the system
