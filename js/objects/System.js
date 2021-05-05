@@ -1006,21 +1006,21 @@ System.grammar = languageGrammar;
 System.executionStack = new ExecutionStack();
 
 // Skin testing code
-console.warn('Skin testing code here too');
-System.updateSkinForPart = function(aPart, aSkin){
-    let props = aSkin[aPart.type];
-    if(!props){
-        return;
-    }
-    Object.keys(props.variants.default).forEach(propName => {
-        let propVal = props.variants.default[propName];
-        aPart.partProperties.setPropertyNamed(
-            aPart,
-            propName,
-            propVal
-        );
-    });
-};
+// console.warn('Skin testing code here too');
+// System.updateSkinForPart = function(aPart, aSkin){
+//     let props = aSkin[aPart.type];
+//     if(!props){
+//         return;
+//     }
+//     Object.keys(props.variants.default).forEach(propName => {
+//         let propVal = props.variants.default[propName];
+//         aPart.partProperties.setPropertyNamed(
+//             aPart,
+//             propName,
+//             propVal
+//         );
+//     });
+// };
 
 // Add a dynamic getter for the World for convenience
 Object.defineProperty(System, 'world', {

@@ -35,9 +35,13 @@ class StackView extends PartView {
 
         // Handle current-ness prop change
         this.onPropChange('current', this.handleCurrentChange);
+        this.onPropChange('skin', (val) => {
+            this.loadSkinStyle(val);
+        });
 
         // Bind methods
         this.handleCurrentChange = this.handleCurrentChange.bind(this);
+        this.loadSkinStyle = this.loadSkinStyle.bind(this);
     }
 
     afterModelSet(){
@@ -65,6 +69,26 @@ class StackView extends PartView {
         }
         if(currentCard){
             currentCard.classList.remove('current-card');
+        }
+    }
+
+    loadSkinStyle(aSkinName){
+        if(!window.System.skins[aSkinName]){
+            return console.warn(`Could not find skin named "${aSkinName}"`);
+        }
+
+        let skinDef = window.System.skins[aSkinName];
+
+        // Load the contents of the style element from the skin def
+        // and prepend to this element's children.
+        let temp = document.createElement('template');
+        temp.innerHTML = skinDef.styleTag;
+        let styleTag = temp.content.cloneNode(true);
+        let existingTag = this.querySelector('style.skin-style');
+        if(existingTag){
+            existingTag.replaceWith(styleTag);
+        } else {
+            this.prepend(styleTag);
         }
     }
 };

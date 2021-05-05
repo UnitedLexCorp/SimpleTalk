@@ -73,6 +73,7 @@ class Part {
         this.startStepping = this.startStepping.bind(this);
         this.stopStepping = this.stopStepping.bind(this);
         this.setTargetProp = this.setTargetProp.bind(this);
+        this.setStylesFromSkinDef = this.setStylesFromSkinDef.bind(this);
 
 
         // Finally, we finish initialization
@@ -604,6 +605,33 @@ class Part {
     stopStepping(){
         clearInterval(this._stepIntervalId);
         this._stepIntervalId = null;
+    }
+
+    /**
+     * Sets all relevant style props to the values
+     * in the incoming Skin Definition object.
+     * If the second argument is true, this method
+     * will be called on all subparts.
+     *
+     */
+    setStylesFromSkinDef(skin, recursive=true){
+        if(skin.styles[this.type]){
+            // TODO: add variants
+            let actualStyles = skin.styles[this.type].variants.default;
+            Object.keys(actualStyles).forEach(styleName => {
+                let styleVal = actualStyles[styleName];
+                this.partProperties.setPropertyNamed(
+                    this,
+                    styleName,
+                    styleVal
+                );
+            });
+        }
+        if(recursive){
+            this.subparts.forEach(subpart => {
+                subpart.setStylesFromSkinDef(skin, true);
+            });
+        }
     }
 
     get isStepping(){

@@ -37,6 +37,32 @@ class Stack extends Part {
             0
         );
 
+        // Initialize the default skin.
+        this.partProperties.newDynamicProp(
+            'skin',
+
+            // Setter
+            function(owner, prop, val, notify=true){
+                if(!window.System.skins[val]){
+                    console.warn(`Could not find skin named "${val}"`);
+                } else {
+                    prop._value = val;
+                    owner.updateSkin(prop._value);
+                }
+            },
+
+            // Getter
+            function(owner, prop){
+                return prop._value;
+            },
+
+            // Read-only
+            false,
+
+            // default value
+            'material'
+        );
+
         // If we are initializing with a name,
         // set the name property
         if(name){
@@ -56,6 +82,7 @@ class Stack extends Part {
         this.goToPrevCard = this.goToPrevCard.bind(this);
         this.goToCardById = this.goToCardById.bind(this);
         this.goToNthCard = this.goToNthCard.bind(this);
+        this.updateSkin = this.updateSkin.bind(this);
     }
 
     goToNextCard(){
@@ -199,6 +226,21 @@ class Stack extends Part {
             return cards[this.currentCardIndex];
         }
         return null;
+    }
+
+    updateSkin(aSkinName){
+        if(!window.System.skins[aSkinName]){
+            return console.warn(`Could not find skin "${aSkinName}"`);
+        }
+
+        // We need to cycle through all subparts, recursively,
+        // and set the style props to the correct value for
+        // the corresponding part type and variants
+        // TODO: add variant capability
+        let skinDef = window.System.skins[aSkinName];
+        this.subparts.forEach(subpart => {
+            subpart.setStylesFromSkinDef(skinDef, true);
+        });
     }
 };
 

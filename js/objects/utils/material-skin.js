@@ -1,3 +1,41 @@
+const cssVars = {
+    // Color Scheme
+    "skin-primary-color-rgb": "83, 58, 113",
+    "skin-secondary-color-rgb": "97, 132, 216",
+    "skin-tertiary-color-rgb": "80, 197, 183",
+    "skin-alt1-color-rgb": "156, 236, 91",
+    "skin-alt2-color-rgb": "240, 244, 101",
+
+    // General Font Constants
+    "skin-font-size": 14,
+    "skin-font-weight": 600,
+    "skin-font-family": "sans-serif",
+    "skin-text-color-dark": "black",
+    "skin-text-color-light": "white",
+
+    // Misc
+    "skin-box-shadow": "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)"
+};
+
+const materialCSS = `
+<style class="skin-style">
+    st-window {
+        --skin-win-bar-background-rgb: ${cssVars['skin-secondary-color-rgb']};
+        --skin-win-bar-text-color: ${cssVars['skin-text-color-light']};
+        --skin-win-bar-min-height: 30px;
+        --skin-win-bar-close-button-content: "u2A2F";
+        --skin-win-bar-button-height: auto;
+        --skin-win-bar-button-width: auto;
+        --skin-win-bar-button-background-color: transparent;
+        --skin-win-bar-button-border-radius: none;
+        --skin-win-pane-border-width: 1px;
+        --skin-win-pane-border-rgb: 150, 150, 150;
+        --skin-win-pane-worder-alpha: 0.5;
+        box-shadow: ${cssVars["skin-box-shadow"]};
+    }
+</style>
+`;
+
 const materialDefinition = {
     "*": {
         
@@ -30,7 +68,13 @@ const materialDefinition = {
     }
 };
 
+let skin = {
+    styleTag: materialCSS,
+    variables: cssVars,
+    styles: materialDefinition
+};
+
 export {
-    materialDefinition as materialSkin,
-    materialDefinition as default
+    skin as material,
+    skin as default
 };
