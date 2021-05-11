@@ -73,6 +73,7 @@ class Part {
         this.startStepping = this.startStepping.bind(this);
         this.stopStepping = this.stopStepping.bind(this);
         this.setTargetProp = this.setTargetProp.bind(this);
+        this.move = this.move.bind(this);
 
 
         // Finally, we finish initialization
@@ -86,6 +87,7 @@ class Part {
         this.setPrivateCommandHandler("setTargetTo", this.setTargetProp);
         this.setPrivateCommandHandler("copy", this.copyCmdHandler);
         this.setPrivateCommandHandler("paste", this.pasteCmdHandler);
+        this.setPrivateCommandHandler("move", this.move);
     }
 
     // Convenience getter to get the id
@@ -202,6 +204,10 @@ class Part {
             new BasicProperty(
                 'enabled',
                 true
+            ),
+            new BasicProperty(
+                'can-move',
+                false
             ),
             new BasicProperty(
                 'id',
@@ -554,6 +560,18 @@ class Part {
                 window.System.clipboard.pasteContentsInto(this);
             }
         }
+    }
+
+    move(senders, movementX, movementY){
+        if(!this.partProperties.getPropertyNamed(this, "can-move")){
+            throw Error(`Part ${this.id} trying to move with 'can-move' property false`);
+        }
+        let top = this.partProperties.getPropertyNamed(this, "top");
+        top += movementY;
+        this.partProperties.setPropertyNamed(this, "top", top);
+        let left = this.partProperties.getPropertyNamed(this, "left");
+        left += movementX;
+        this.partProperties.setPropertyNamed(this, "left", left);
     }
 
     /** Property Subscribers
